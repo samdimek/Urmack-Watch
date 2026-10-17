@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Urmack Watch — Tech Stack &amp; Chain Strategy</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap');
+  @page { size: A4; margin: 18mm 16mm; }
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; color: #1c2420; font-size: 10.5pt; line-height: 1.55; margin: 0; }
+  h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; color: #101413; letter-spacing: -.02em; }
+  h1 { font-size: 22pt; margin: 0 0 4px; }
+  h2 { font-size: 14pt; border-bottom: 2px solid #b7ff5a; padding-bottom: 5px; margin: 26px 0 12px; page-break-after: avoid; }
+  h3 { font-size: 11pt; margin: 18px 0 6px; color: #2a322e; page-break-after: avoid; }
+  p { margin: 6px 0; }
+  ul, ol { margin: 6px 0; padding-left: 22px; }
+  li { margin: 3px 0; }
+  code, .mono { font-family: 'JetBrains Mono', monospace; font-size: 8.8pt; }
+  code { background: #eef1ea; padding: 1px 5px; border-radius: 3px; }
+  pre { background: #101413; color: #d9e2d6; font-family: 'JetBrains Mono', monospace; font-size: 8.2pt; line-height: 1.5; padding: 12px 14px; border-radius: 6px; overflow-x: hidden; page-break-inside: avoid; white-space: pre; }
+  pre .c { color: #7f8f84; }
+  pre .g { color: #b7ff5a; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt; page-break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { page-break-inside: avoid; }
+  th { background: #101413; color: #f1f4ee; text-align: left; padding: 7px 9px; font-family: 'JetBrains Mono', monospace; font-size: 8pt; letter-spacing: .06em; text-transform: uppercase; font-weight: 500; }
+  td { border-bottom: 1px solid #d5dbd2; padding: 7px 9px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f6f8f2; }
+  .cover { text-align: left; padding: 90px 0 40px; }
+  .cover .tag { font-family: 'JetBrains Mono', monospace; font-size: 9pt; letter-spacing: .22em; color: #5c6b60; text-transform: uppercase; }
+  .cover .tagline { font-size: 13pt; color: #3c453f; margin-top: 14px; max-width: 480px; }
+  .cover .meta { margin-top: 60px; font-size: 9pt; color: #5c6b60; }
+  .cover .meta div { margin: 2px 0; }
+  .callout { border-left: 4px solid #b7ff5a; background: #f2f7e8; padding: 10px 14px; margin: 12px 0; page-break-inside: avoid; }
+  .callout.warn { border-left-color: #d97b3a; background: #faf1e9; }
+  .callout strong { font-family: 'Space Grotesk', sans-serif; }
+  .badge { display: inline-block; background: #101413; color: #b7ff5a; font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; padding: 2px 8px; border-radius: 3px; letter-spacing: .08em; vertical-align: middle; }
+  .badge.alt { background: #f2f7e8; color: #101413; border: 1px solid #101413; }
+  .page-break { page-break-before: always; }
+  .arch-box { border: 1.5px solid #101413; border-radius: 6px; padding: 10px 12px; margin: 8px 0; page-break-inside: avoid; }
+  .arch-box .name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 10.5pt; }
+  .arch-box .name .badge { margin-left: 8px; }
+  .arch-box p { margin: 4px 0 0; font-size: 9.3pt; color: #3c453f; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .footer-note { margin-top: 34px; padding-top: 10px; border-top: 1px solid #d5dbd2; font-size: 8pt; color: #5c6b60; }
+  .src { font-size: 8pt; color: #5c6b60; }
+  .src a { color: #4a5a4e; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="tag">Urmack · Flagship Product · Confidential</div>
+  <h1>Urmack Watch</h1>
+  <p class="tagline">The build guide: which chains we monitor and in what order, the exact technology stack, the cost model, and the engineering nitty-gritty required to ship a multi-tenant DeFi invariant-monitoring SaaS.</p>
+  <div class="meta">
+    <div><strong>Document</strong> 04 — Tech Stack &amp; Chain Strategy</div>
+    <div><strong>Companion documents</strong> 01 System Architecture · 02 Flows &amp; SDLC Roadmap · 03 Product Designs</div>
+    <div><strong>Version</strong> 1.0 · 16 October 2026</div>
+    <div><strong>Author</strong> Office of the Interim CTO, Urmack</div>
+    <div><strong>Status</strong> Approved for build — governs all Phase 0–2 engineering decisions</div>
+  </div>
+</section>
+
+<div class="page-break"></div>
+<h2>1. The decision at a glance</h2>
+<table>
+  <thead><tr><th style="width:24%">Decision</th><th style="width:38%">Choice</th><th>Why (short form)</th></tr></thead>
+  <tr><td><strong>Chain strategy</strong></td><td>Ethereum L1 first, then Base + Arbitrum One (Phase 1–2); OP Stack family next; Solana only in Phase 3 behind an adapter interface</td><td>Ethereum holds ~$49.7B of ~$65B+ tracked DeFi TVL; L2s add cheap, fast blocks where the same EVM adapter works unchanged</td></tr>
+  <tr><td><strong>Language / runtime</strong></td><td>TypeScript (strict) everywhere, Node 22 LTS, <code>viem</code> for chain I/O</td><td>One language across portal, API, compiler and workers; viem's typed ABIs make spec compilation a type-level problem</td></tr>
+  <tr><td><strong>Architecture shape</strong></td><td>pnpm monorepo — Next.js portal · Hono API · scheduler · evaluator workers</td><td>Control plane and evaluation plane deploy independently (Doc 01 §3)</td></tr>
+  <tr><td><strong>Data acquisition</strong></td><td><strong>Direct RPC polling is the product.</strong> Indexers (Ponder/Goldsky) are optional for evidence and dashboards, never on the critical path</td><td>Invariants read <em>current state</em> via batched <code>eth_call</code>; a third-party indexer adds a dependency we'd have to trust for our own alerts</td></tr>
+  <tr><td><strong>Storage</strong></td><td>Supabase Postgres (RLS = tenancy) + TimescaleDB hypertable for evaluations + S3/R2 evidence objects</td><td>Already in the stack; RLS gives hard multi-tenant isolation with almost no code</td></tr>
+  <tr><td><strong>Jobs / coordination</strong></td><td>BullMQ on Redis, block-height-driven ticks, one-in-flight lock per plan</td><td>Boring, proven, retries and backpressure for free</td></tr>
+  <tr><td><strong>Alert delivery</strong></td><td>HMAC-signed webhooks + Telegram / Discord / Slack / PagerDuty / email; WhatsApp Cloud API on premium</td><td>Meets buyers where their on-call already lives</td></tr>
+  <tr><td><strong>Billing</strong></td><td>Stripe Billing (metered overages on evaluations + chains)</td><td>0.7% PAYG; metered usage without re-platforming later</td></tr>
+  <tr><td><strong>Hosting</strong></td><td>Portal + API on Vercel/Fly; workers on Fly.io or Render (long-running, region-pinned near RPC); Cloudflare only for edge/WAF</td><td>Workers need sticky state (Redis, sockets) and predictable egress — a plain container beats serverless here</td></tr>
+</table>
+
+<h2>2. Which blockchain? Chain selection and rollout order</h2>
+<p><strong>Anchor: Ethereum.</strong> Not because it is fashionable, but because that is where the collateral, the stablecoins and the buyers are. TVL and protocol counts below are DeFiLlama snapshots of <strong>16 October 2026</strong>.</p>
+
+<table>
+  <thead><tr><th style="width:6%">#</th><th style="width:16%">Chain</th><th style="width:13%">DeFi TVL</th><th style="width:11%">Protocols</th><th>Why it matters to Urmack Watch</th></tr></thead>
+  <tr><td>1</td><td><strong>Ethereum L1</strong></td><td>$49.7B</td><td>1,680</td><td>Anchor deployment. Lending (Aave, Morpho, Spark), LST/LRT restaking (Lido, EigenLayer, ether.fi), stablecoins — exactly the invariant families we sell (solvency, share price, collateral ratio).</td></tr>
+  <tr><td>2</td><td><strong>Base</strong></td><td>$6.13B</td><td>1,018</td><td>Second by TVL; large Morpho/Aave footprint, ~$5.26B stablecoins. Same EVM + OP Stack finality model as #7, so marginal integration cost is near zero.</td></tr>
+  <tr><td>3</td><td><strong>Solana</strong></td><td>$5.91B</td><td>551</td><td>Large and active (2.9M daily active addresses, $2.35B daily perps) but a different runtime — no <code>eth_call</code>, no shared ABI path. Phase 3 behind the adapter interface, not before.</td></tr>
+  <tr><td>4</td><td><strong>BNB Chain</strong></td><td>$5.47B</td><td>1,140</td><td>Retail DeFi scale (PancakeSwap, Venus), cheap EVM. Low priority for security-budget buyers; Phase 2.</td></tr>
+  <tr><td>5</td><td><strong>Arbitrum One</strong></td><td>$1.40B</td><td>1,014</td><td><strong>Priority above its TVL rank:</strong> $3.39B daily perps volume (GMX et al.) — perps/cross-margin invariants are high-value and underserved.</td></tr>
+  <tr><td>6</td><td><strong>Polygon PoS</strong></td><td>$676M</td><td>776</td><td>Aave deployments + prediction markets. Phase 2.</td></tr>
+  <tr><td>7</td><td><strong>Optimism</strong></td><td>$443M</td><td>429</td><td>Smaller footprint, but OP Stack — adds as config once Base works.</td></tr>
+  <tr><td>8</td><td><strong>Avalanche</strong></td><td>$596M</td><td>570</td><td>Lending + RWA niche; on demand.</td></tr>
+  <tr><td>—</td><td><em>Watchlist</em></td><td colspan="2">Hyperliquid $1.04B TVL / $13.5B daily perps · Monad $992M</td><td>Hyperliquid matters if perps risk is in scope but needs its own integration assessment; Monad is young. Re-evaluate quarterly.</td></tr>
+</table>
+
+<div class="callout"><strong>Chain decision.</strong> Phase 1 ships <strong>Ethereum + Base + Arbitrum One</strong> on one EVM adapter: it covers ~$57B of TVL and every invariant category we sell, and Arbitrum supplies the perps exposure. Phase 2 adds the remaining OP Stack chains, Polygon and BNB as <em>configuration</em>, not new code. Solana is a Phase 3 adapter, gated on demand from a design partner. <strong>We are chain-agnostic in the spec language and chain-specific in the adapter</strong> — a spec says "contract X on chain Y", never "call this RPC".</div>
+
+<h3>2.1 Finality policy — the nitty-gritty that decides alert credibility</h3>
+<p>Block-count depth rules are wrong on L2s. The meaningful states are: <em>sequencer-ordered</em> → <em>posted to L1</em> → <em>L1-finalized</em>. We model finality as a <strong>state</strong> attached to every evaluation, and alert latency is decoupled from confidence:</p>
+<table>
+  <thead><tr><th style="width:16%">Chain</th><th style="width:18%">Block cadence</th><th style="width:24%">Intermediate ("safe")</th><th style="width:20%">Strong finality</th><th>Urmack Watch policy</th></tr></thead>
+  <tr><td>Ethereum</td><td>12 s slots; epoch = 6.4 min</td><td>RPC <code>safe</code> tag</td><td><code>finalized</code> ≈ 12.8 min (~64 blocks)</td><td>Detect on <code>latest</code>, fire Critical <strong>immediately</strong>, tag the alert <code>provisional</code>; auto-escalate to <code>finalized</code> ~13 min later or <strong>retract loudly</strong> on reorg</td></tr>
+  <tr><td>Arbitrum One</td><td>250 ms ordering</td><td>Batch posted to L1</td><td>~15–19 min after L1 batch inclusion</td><td>Detect on sequencer feed (<code>provisional</code>); confirm when the batch finalizes on L1</td></tr>
+  <tr><td>Base</td><td>Flashblock ~200 ms; L2 block 2 s</td><td>L1 batch ≈ 2 min</td><td>≈ 20 min</td><td>Detect on Flashblock head; confirm on L1 batch finality</td></tr>
+  <tr><td>Optimism</td><td>2 s blocks</td><td><code>safe</code> = data posted to L1</td><td>15–30 min after submission</td><td>Same as Base (shared OP Stack semantics)</td></tr>
+</table>
+<div class="callout warn"><strong>Two rules.</strong> (1) <em>Alert fast, retract loudly</em> — a Critical invariant breach waits for nothing; correctness of the retraction is what earns trust. (2) The 7-day Standard Bridge withdrawal delay is <strong>not</strong> transaction finality, and neither is a sequencer's sub-second soft confirmation. Doc 01 §7's heartbeat covers the case where our own view of the head stops moving.</div>
+
+<h2 class="page-break">3. The stack, layer by layer</h2>
+
+<div class="arch-box"><div class="name">1 · Portal <span class="badge">NEXT.JS 15 · TS STRICT · TAILWIND</span></div><p>App Router, server components for dashboards, client islands for the invariant editor (YAML editor + live dry-run results). Auth via Supabase magic link in Phase 1, SSO/SAML for enterprise in Phase 3. Deployment: Vercel (or Fly for EU residency).</p></div>
+<div class="arch-box"><div class="name">2 · API <span class="badge">HONO</span></div><p>Fetch-standard typed routes: orgs, protocols, contracts, specs, routes, alert query. Runs on Node 22 (Fly) — same binary type as workers, one Dockerfile. Zod-validated bodies, OpenAPI generated from routes. <code>GET</code> responses carrying tenant data send <code>Cache-Control: no-store</code>.</p></div>
+<div class="arch-box"><div class="name">3 · Spec compiler <span class="badge">YAML → PLAN</span></div><p><code>packages/spec-lang</code>: YAML spec → JSON Schema → Zod-validated <strong>evaluation plan</strong> (a <code>viem</code> multicall payload + assertion function + finality policy + thresholds). Plan versions are immutable and checksummed; the evaluator never reads YAML at runtime.</p></div>
+<div class="arch-box"><div class="name">4 · Scheduler <span class="badge">NODE · REDIS</span></div><p>Subscribes to block headers per chain (<code>viem</code> <code>watchBlockNumber</code> with polling fallback). On tick: claim each due plan via <code>SET NX PX</code> lock, enqueue on BullMQ. Emits heartbeat if <code>now − last_eval &gt; 3 × interval</code>.</p></div>
+<div class="arch-box"><div class="name">5 · Evaluator workers <span class="badge">BULLMQ · VIEM</span></div><p>Pull job → build consistent snapshot at one block number (batched <code>eth_call</code> multicall3 + bounded <code>getLogs</code> window) → run assertion (point-in-time / temporal / derived) → write result (pass <em>and</em> margin) → if breach, hold until finality state allows and hand to router. Horizontal scale = more workers; one plan in flight at a time.</p></div>
+<div class="arch-box"><div class="name">6 · Alert router <span class="badge">TYPESCRIPT</span></div><p>Severity classification → dedup key (<code>spec_id + breach_kind</code>) → cooldown → evidence pack assembly → fan-out adapters (webhook HMAC-SHA256 over <code>ts.body</code> with 5-min replay window; Telegram/Discord/Slack bots; PagerDuty Events API v2; Resend email; WhatsApp Cloud API on premium). Retries: 5× exponential with jitter; dead-letter to the alert record.</p></div>
+<div class="arch-box"><div class="name">7 · Storage <span class="badge">SUPABASE · TIMESCALE · R2</span></div><p>Postgres + RLS for tenancy/specs/alerts/audit; Timescale hypertable <code>evaluation</code> partitioned by plan, retention policy 90 d raw / 2 y hourly; Upstash/Redis for locks and circuit breakers; Cloudflare R2 (or S3) for immutable evidence packs with 15-minute signed URLs.</p></div>
+
+<h3>3.1 Monorepo layout</h3>
+<pre><span class="c"># pnpm workspace + turborepo — one repo, one CI pipeline</span>
+urmack-watch/
+├─ apps/
+│  ├─ portal/            <span class="c"># Next.js 15 client portal</span>
+│  ├─ api/               <span class="c"># Hono REST API (control plane)</span>
+│  ├─ scheduler/         <span class="c"># block watchers, tick emission, heartbeat</span>
+│  ├─ evaluator/         <span class="c"># BullMQ workers — the evaluation plane</span>
+│  └─ router/            <span class="c"># severity, dedup, evidence, channel adapters</span>
+├─ packages/
+│  ├─ spec-lang/         <span class="c"># YAML DSL, JSON Schema, plan compiler (Zod)</span>
+│  ├─ chain/             <span class="c"># viem clients, per-chain adapters, finality policy</span>
+│  ├─ severity/          <span class="c"># classification + cooldown rules</span>
+│  ├─ evidence/          <span class="c"># evidence-pack builder, S3 writer</span>
+│  └─ db/                <span class="c"># migrations, RLS policies, typed client</span>
+├─ infra/
+│  ├─ docker-compose.yml <span class="c"># postgres+timescale, redis, minio, mailpit</span>
+│  └─ terraform/         <span class="c"># fly.io apps, R2, DNS, secrets</span>
+└─ .github/workflows/    <span class="c"># ci.yml: lint → typecheck → unit → e2e → deploy</span></pre>
+
+<h3>3.2 Local development &amp; environments</h3>
+<ul>
+  <li><strong>Anvil (Foundry)</strong> fork of Ethereum mainnet for integration tests — a fixture protocol with a deliberately breakable invariant (drain the reserve, skew the share price) proves the whole pipeline end-to-end in CI.</li>
+  <li>Three environments: <code>local</code> (docker-compose + Anvil) · <code>staging</code> (real RPC, synthetic protocol, no real routes) · <code>prod</code>. Spec fixtures and alert-route fixtures are shared via seed scripts.</li>
+  <li>CI gates: <code>tsc --noEmit</code>, ESLint, Vitest unit + Anvil integration, RLS policy tests (two tenants, cross-tenant read must 404/403), and a 24-hour shadow run of the scheduler before any production deploy touching the evaluation plane.</li>
+</ul>
+
+<h2 class="page-break">4. Data acquisition: RPC-first, indexers optional</h2>
+<p>The product's critical path reads <em>current state</em>: balances, ratios, share prices, privileged-role changes. That is <code>eth_call</code> + <code>getLogs</code> work, not a graph query. Building on an indexer would mean our alerts depend on a third party's sync lag — unacceptable for a product whose promise is "we tell you the moment an invariant breaks".</p>
+<table>
+  <thead><tr><th style="width:20%">Option</th><th style="width:34%">Shape</th><th>Role for Urmack Watch</th></tr></thead>
+  <tr><td><strong>Alchemy / QuickNode</strong></td><td>Managed RPC; Alchemy free 30M CU/mo then $0.525/M CU; QuickNode Build 80M credits/$49 mo ($34 annual), overage $0.62/M</td><td><strong>Primary.</strong> Two providers simultaneously from day one (different vendors, not two keys of one) for circuit-breaker failover.</td></tr>
+  <tr><td><strong>dRPC</strong></td><td>PAYG, 210M free CU/mo, ~$6/M requests</td><td>Cheap overflow tier for backfills and historical evidence gathering.</td></tr>
+  <tr><td><strong>Self-hosted Erigon + Lighthouse</strong></td><td>Your hardware, no meter — plus sync, disk, bandwidth, on-call</td><td>Phase 3 option once one chain's RPC bill &gt; ~$3k/mo, or for archive-heavy evidence queries. Not before.</td></tr>
+  <tr><td><strong>Ponder</strong> / <strong>SQD</strong> / <strong>Goldsky</strong> / <strong>The Graph</strong></td><td>Self-hosted TS indexer; managed pipelines ($5/M RPC on SQD/Goldsky, subgraph worker time $0.05/h, Graph Studio 100k free queries then $2/100k)</td><td><strong>Non-critical only:</strong> portfolio dashboards, "30-day margin history" precomputation, deep incident forensics. If it lags, we lose a chart — not an alert.</td></tr>
+</table>
+<div class="callout"><strong>Rule: nothing on the alert path may have a sync lag we do not control.</strong> The indexer earns its place only after Phase 1, and only where it demonstrably removes RPC load.</div>
+
+<h3>4.1 RPC cost model (per protocol per month)</h3>
+<p>Assumption: one snapshot ≈ 150 CU (one multicall ≈ 26 CU + bounded <code>getLogs</code> + a few reads). Real numbers come from Phase 0's spike — this is the budget to design against:</p>
+<table>
+  <thead><tr><th>Cadence</th><th>Ticks / day</th><th>CU / month</th><th>At $0.525/M CU</th><th>Notes</th></tr></thead>
+  <tr><td>5 min (Tier 1)</td><td>288</td><td>1.3M</td><td><strong>≈ $0.70</strong></td><td>Baseline plan; RPC cost is noise</td></tr>
+  <tr><td>1 min</td><td>1,440</td><td>6.5M</td><td>≈ $3.40</td><td>Most Tier 2 protocols</td></tr>
+  <tr><td>10 s</td><td>8,640</td><td>39M</td><td>≈ $20.50</td><td>Perps / high-value lending</td></tr>
+  <tr><td>Per block (L2 @ 2 s)</td><td>43,200</td><td>194M</td><td>≈ $102</td><td>Only where a customer pays for it</td></tr>
+</table>
+<p class="src">Multiply by 2 for historical backfill, traces and evidence re-queries. Even a 20-protocol Tier-2 portfolio lands under ~$1k/mo in RPC — <strong>the economics of this product are not gated by compute; they are gated by distribution.</strong></p>
+
+<h3>4.2 Monthly infrastructure budget</h3>
+<table>
+  <thead><tr><th style="width:34%">Line item</th><th style="width:30%">Phase 1 (alpha)</th><th>Phase 2–3 (beta → GA)</th></tr></thead>
+  <tr><td>Supabase Pro (+ disk/Timescale)</td><td>$25–50</td><td>$100–250 (compute add-ons, PITR)</td></tr>
+  <tr><td>Redis (Upstash / managed)</td><td>$0–20</td><td>$50–150</td></tr>
+  <tr><td>Workers + API compute (Fly/Render)</td><td>$50–100</td><td>$300–800 (evaluator scales with protocols)</td></tr>
+  <tr><td>RPC providers (two vendors)</td><td>$0–50</td><td>$300–1,500</td></tr>
+  <tr><td>R2 evidence storage + egress</td><td>&lt; $10</td><td>$20–100</td></tr>
+  <tr><td>Alert/email providers, domain, WAF</td><td>$30–60</td><td>$100–300</td></tr>
+  <tr><td>Observability (OTel → Grafana Cloud, Sentry)</td><td>$0–50</td><td>$150–400</td></tr>
+  <tr><td><strong>Total</strong></td><td><strong>≈ $160–340 / mo</strong></td><td><strong>≈ $1,000–3,500 / mo</strong></td></tr>
+</table>
+<p class="src">One design-partner contract at the recommended entry price covers Phase 1 infrastructure with room to spare (see §8).</p>
+
+<h2 class="page-break">5. The spec language and evaluation loop (the actual product)</h2>
+<p>Everything above is plumbing. The asset is the language and the engine:</p>
+<pre><span class="c"># invariant: eth-solvency-usdc — declarative, human-auditable</span>
+<span class="g">name:</span> Reserve solvency (USDC vault)
+<span class="g">protocol:</span> acme-vault
+<span class="g">kind:</span> point_in_time            <span class="c"># point_in_time | temporal | derived</span>
+<span class="g">cadence:</span> 60s
+<span class="g">severity:</span> critical
+<span class="g">observe:</span>
+  <span class="g">assets:</span>   { call: "totalAssets()" }
+  <span class="g">liabilities:</span> { call: "totalLiabilities()" }
+<span class="g">assert:</span> assets &gt;= liabilities * 1.02   <span class="c"># 2% safety band → Warning at 1.05</span>
+<span class="g">temporal:</span> holds_for: 3_blocks           <span class="c"># suppresses single-block noise</span>
+<span class="g">finalize:</span> alert_at: provisional         <span class="c"># confirm_at: finalized (§2.1)</span></pre>
+<ol>
+  <li><strong>Compile.</strong> Resolves contract addresses + proxies, expands <code>observe</code> into a multicall3 payload, type-checks return types against the ABI, emits <code>EvalPlan{version, checksum}</code>.</li>
+  <li><strong>Dry-run gate.</strong> The plan replays over 7 days of history; a spec that fails or throws cannot be armed. This is the false-positive firewall.</li>
+  <li><strong>Arm.</strong> Scheduler picks it up at its cadence; every evaluation — pass or fail — writes <code>(plan, block, ts, values, pass, margin)</code>.</li>
+  <li><strong>Breach.</strong> Hold to finality policy → classify → dedup/cooldown → evidence pack → route. Margin history powers the "how close did we come?" chart, which is the feature that keeps customers after the adrenaline fades.</li>
+</ol>
+
+<h2>6. Security &amp; multi-tenancy nitty-gritty</h2>
+<table>
+  <thead><tr><th style="width:28%">Concern</th><th>Implementation</th></tr></thead>
+  <tr><td>Signing material</td><td><strong>None. Ever.</strong> The product holds read-only RPC credentials only; no wallet, no signer, no key-management service is provisioned in any environment.</td></tr>
+  <tr><td>Tenant isolation</td><td>Postgres RLS on every table with <code>org_id</code>; the API's DB role is <em>not</em> <code>service_role</code> in request context; cross-tenant probes are a CI test, and an RLS pen-test is a Phase 2 exit gate.</td></tr>
+  <tr><td>Secrets</td><td>GitHub OIDC → cloud secret manager (no long-lived CI keys); <code>age/SOPS</code>-encrypted repo config for local dev; provider keys scoped per chain and rotated quarterly; webhook HMAC keys per route.</td></tr>
+  <tr><td>Supply chain</td><td>pnpm lockfile + <code>pnpm audit</code> in CI, Dependabot/Renovate, SBOM per release, no postinstall scripts from new deps without review.</td></tr>
+  <tr><td>Auditability</td><td>Append-only <code>audit_log</code> (who changed a spec/route/severity, with before/after); alert status transitions (open → acked → resolved / false-positive) are part of the audit trail.</td></tr>
+  <tr><td>Evidence objects</td><td>Immutable, 90-day retention, 15-min signed URLs, served no-store; exportable as a bundle for IR retainers.</td></tr>
+  <tr><td>Abuse resistance</td><td>Per-org rate limits at the API, per-route alert rate caps, re-auth (step-up) for routing/severity changes.</td></tr>
+</table>
+
+<h2 class="page-break">7. Integration &amp; delivery nitty-gritty</h2>
+<div class="two-col">
+  <div>
+    <h3>Outbound (alert channels)</h3>
+    <ul>
+      <li><strong>Webhook:</strong> <code>POST</code> JSON, headers <code>X-Urmack-Signature: sha256=…</code>, <code>X-Urmack-Timestamp</code> (±5 min), <code>X-Urmack-Alert-Id</code> as idempotency key; verify snippet published in docs for JS/Python/Go.</li>
+      <li><strong>Retries:</strong> 5 attempts, exponential backoff + jitter, then DLQ → visible as <code>delivery_failed</code> on the alert, not silent.</li>
+      <li><strong>PagerDuty:</strong> Events API v2, severity mapping Critical→critical, Warning→warning.</li>
+      <li><strong>Telegram/Discord/Slack:</strong> bot per workspace; message contains severity, invariant, observed vs. threshold, block, link to evidence.</li>
+      <li><strong>WhatsApp Cloud API:</strong> premium tier only, template messages, opt-in captured in portal.</li>
+      <li><strong>Inbound:</strong> Slack interactivity (ack/resolve from the channel) writes back through the API with signed verification.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Control &amp; operations</h3>
+    <ul>
+      <li><strong>Auth:</strong> Supabase Auth (magic link → passkeys → enterprise SSO). Session in HTTP-only cookie; no tokens in localStorage.</li>
+      <li><strong>Billing:</strong> Stripe — flat platform fee + metered overage (evaluations beyond plan cadence, chains beyond plan count); webhook → <code>billing_status</code> with grace-period degradation (degrade cadence, never delete data).</li>
+      <li><strong>Observability:</strong> OpenTelemetry traces across scheduler → worker → router; RED metrics per plan; Grafana Cloud alert on <em>our own</em> eval SLO (99.9% of expected ticks completed) plus dead-man on heartbeat.</li>
+      <li><strong>Feature flags / config:</strong> env-driven per-environment config, no hard-coded chain lists — chains are rows in a <code>chain_config</code> table.</li>
+      <li><strong>Backups:</strong> PITR on Postgres, cross-region R2 replication for evidence, quarterly restore drill recorded in the runbook.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>8. Packaging &amp; price sanity-check</h2>
+<p>Competitive reference points (Oct 2026): <strong>Forta</strong> sells token-denominated subscriptions (General Plan announced at 250 FORT/mo; Premium Feeds priced per feed) — no transparent USD anchor. <strong>Hypernative</strong> is demo/quote-led with no public price. <strong>Tenderly</strong> alerts are paywalled, sales-gated. <strong>Chainlink Automation was deprecated in mid-2026</strong> (CRE is the successor), removing the one gas-plus-premium incumbent reference. <em>No competitor publishes a clean "economic invariant monitoring" price — which is the opening.</em></p>
+<table>
+  <thead><tr><th style="width:16%">Tier</th><th style="width:16%">Price</th><th style="width:34%">Included</th><th>Overage</th></tr></thead>
+  <tr><td><strong>Sentinel</strong></td><td>$499 / mo</td><td>1 protocol, 3 chains (Phase 2), 10 invariants, 5-min cadence, 90-day history, webhook/Telegram/Discord/email</td><td>$150 / extra chain</td></tr>
+  <tr><td><strong>Guardian</strong></td><td>$1,999 / mo</td><td>3 protocols, 1-min cadence (10 s on request), unlimited invariants, PagerDuty + Slack, 1-year history, evidence packs, 30-min response SLA</td><td>$400 / extra protocol</td></tr>
+  <tr><td><strong>Sentinel+ IR</strong></td><td>Custom (≥ $4k / mo)</td><td>Portfolio coverage, per-block cadence, private invariants, IR retainer hand-off, dedicated Slack channel, custom chains</td><td>Contractual</td></tr>
+</table>
+<p class="src">Rationale: at these prices the whole infrastructure bill (§4.2) is a rounding error against a single mid-tier customer, and we price against <em>assurance</em> — invariant coverage, latency, evidence, response — not against raw alerts, where Forta/Hypernative would commoditize us. Revisit after Phase 1 design-partner feedback.</p>
+
+<h2>9. 90-day build order (what to write, in sequence)</h2>
+<table>
+  <thead><tr><th style="width:16%">Week</th><th style="width:44%">Deliverable</th><th>Exit criterion</th></tr></thead>
+  <tr><td>1–2 (Phase 0)</td><td>Spikes: RPC multi-provider failover; <code>spec-lang</code> compiler for <code>point_in_time</code>; Anvil fixture protocol</td><td>One invariant evaluated against Anvil + one against Ethereum mainnet read-only, both producing <code>EvaluationResult</code></td></tr>
+  <tr><td>3–4</td><td>Scheduler + evaluator + Timescale write path + heartbeat dead-man</td><td>24 h unattended run, zero missed ticks, synthetic breach → alert in &lt; 60 s</td></tr>
+  <tr><td>5–6</td><td>Alert router + evidence pack v1 + webhook/Telegram</td><td>Signed webhook verified by a reference consumer; evidence bundle opens standalone</td></tr>
+  <tr><td>7–8</td><td>Supabase RLS tenancy + Hono API + portal read views</td><td>Two-tenant isolation test green; design partner can view their first live invariant</td></tr>
+  <tr><td>9–10</td><td>Portal editor + dry-run gate + Base &amp; Arbitrum adapters</td><td>Self-serve spec authoring → 7-day dry-run → armed, without engineering staff</td></tr>
+  <tr><td>11–12</td><td>Stripe billing, onboarding flow, staging hardening, docs</td><td>Phase 1 gate: 30 consecutive days of correct evaluation begins (Doc 01 §2)</td></tr>
+</table>
+
+<h2>10. Sources</h2>
+<p class="src">
+DeFiLlama chain TVL pages (16 Oct 2026 snapshots) — defillama.com/chain/ethereum · /chain/base · /chain/solana · /chain/bsc · /chain/arbitrum · /chain/polygon · /chain/avalanche · /chain/op-mainnet · /chain/hyperliquid-l1 · /chain/monad<br>
+Finality: ethereum.org/developers/docs/consensus-mechanisms/pos/ · docs.base.org/specifications/transactions/transaction-finality · docs.optimism.io/op-stack/transactions/transaction-finality · docs.arbitrum.io/how-arbitrum-works/deep-dives/sequencer · docs.arbitrum.io/how-arbitrum-works/inside-arbitrum-nitro · developers.circle.com/cctp/concepts/finality-and-block-confirmations<br>
+Protocol/upgrade context: blog.ethereum.org/2025/04/23/pectra-mainnet · blog.ethereum.org/2025/11/06/fusaka-mainnet-announcement · docs.arbitrum.io/how-arbitrum-works/bold/gentle-introduction · l2beat.com/layer2s/summary<br>
+Pricing: alchemy.com/pricing · quicknode.com/pricing · drpc.org/pricing · supabase.com/pricing · neon.com/pricing · stripe.com/billing/pricing · docs.sqd.dev/en/cloud/pricing/overview · goldsky.com/pricing · thegraph.com/studio-pricing · docs.forta.network/en/latest/fees-faqs/ · hypernative.io/product/onchain-monitoring-automated-response · docs.tenderly.co/monitoring/alerts/introduction · docs.chain.link/cre/reference/cla-migration-ts<br>
+Indexer self-hosting: ponder.sh/docs/production/self-hosting · docs.sqd.dev/en/sdk/self-hosting · github.com/erigontech/erigon
+</p>
+
+<div class="footer-note">Urmack Watch — Tech Stack &amp; Chain Strategy · v1.0 · 16 Oct 2026 · Companion: 01 System Architecture, 02 Flows &amp; SDLC Roadmap, 03 Product Designs</div>
+
+</body>
+</html>

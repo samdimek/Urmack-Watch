@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Urmack Watch — Pre-Build Reading &amp; Security Playbook</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap');
+  :root { color-scheme: light; }
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; color: #1c2420; font-size: 10.5pt; line-height: 1.55; margin: 0; }
+  h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; color: #101413; letter-spacing: -.02em; }
+  h1 { font-size: 22pt; margin: 0 0 4px; }
+  h2 { font-size: 14pt; border-bottom: 2px solid #b7ff5a; padding-bottom: 5px; margin: 26px 0 12px; page-break-after: avoid; }
+  h3 { font-size: 11pt; margin: 18px 0 6px; color: #2a322e; page-break-after: avoid; }
+  p { margin: 6px 0; }
+  ul, ol { margin: 6px 0; padding-left: 22px; }
+  li { margin: 3px 0; }
+  code, .mono { font-family: 'JetBrains Mono', monospace; font-size: 8.8pt; }
+  code { background: #eef1ea; padding: 1px 5px; border-radius: 3px; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt; page-break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { page-break-inside: avoid; }
+  th { background: #101413; color: #f1f4ee; text-align: left; padding: 7px 9px; font-family: 'JetBrains Mono', monospace; font-size: 8pt; letter-spacing: .06em; text-transform: uppercase; font-weight: 500; }
+  td { border-bottom: 1px solid #d5dbd2; padding: 7px 9px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f6f8f2; }
+  .cover { text-align: left; padding: 90px 0 40px; }
+  .cover .tag { font-family: 'JetBrains Mono', monospace; font-size: 9pt; letter-spacing: .22em; color: #5c6b60; text-transform: uppercase; }
+  .cover .tagline { font-size: 13pt; color: #3c453f; margin-top: 14px; max-width: 480px; }
+  .cover .meta { margin-top: 60px; font-size: 9pt; color: #5c6b60; }
+  .cover .meta div { margin: 2px 0; }
+  .callout { border-left: 4px solid #b7ff5a; background: #f2f7e8; padding: 10px 14px; margin: 12px 0; page-break-inside: avoid; }
+  .callout.warn { border-left-color: #d97b3a; background: #faf1e9; }
+  .callout strong { font-family: 'Space Grotesk', sans-serif; }
+  .badge { display: inline-block; background: #101413; color: #b7ff5a; font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; padding: 2px 8px; border-radius: 3px; letter-spacing: .08em; vertical-align: middle; }
+  .badge.alt { background: #f2f7e8; color: #101413; border: 1px solid #101413; }
+  .badge.defer { background: #faf1e9; color: #8a4a1c; border: 1px solid #d97b3a; }
+  .page-break { page-break-before: always; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .footer-note { margin-top: 34px; padding-top: 10px; border-top: 1px solid #d5dbd2; font-size: 8pt; color: #5c6b60; }
+  .src { font-size: 8pt; color: #5c6b60; }
+  .risk-h { color: #8a4a1c; font-weight: 600; }
+  .risk-m { color: #2a6b3f; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="tag">Urmack · Flagship Product · Confidential</div>
+  <h1>Urmack Watch</h1>
+  <p class="tagline">What to read before writing code, the security risks that can sink this product, the standards we hold ourselves to, and the controls we build with — from day one, not after the first incident.</p>
+  <div class="meta">
+    <div><strong>Document</strong> 05 — Pre-Build Reading &amp; Security Playbook</div>
+    <div><strong>Companion documents</strong> 01 System Architecture · 02 Flows &amp; SDLC Roadmap · 03 Product Designs · 04 Tech Stack &amp; Chain Strategy</div>
+    <div><strong>Version</strong> 1.0 · 16 October 2026</div>
+    <div><strong>Author</strong> Office of the Interim CTO, Urmack</div>
+    <div><strong>Status</strong> Approved for build — gates referenced from Doc 01 §2 and Doc 04 §9</div>
+  </div>
+</section>
+
+<div class="page-break"></div>
+<h2>1. How to use this document</h2>
+<p>Documents 01–04 say what we are building and with what. This one answers three questions a builder must settle <em>before</em> week 1: <strong>what do I read first, what can go wrong, and which security standards and measures actually apply to us?</strong> §2 is the reading list in priority order; §3 the risk register; §4 the standards we adopt vs. defer; §5 the concrete controls in the codebase; §6 the compliance timeline; §7 disclosure duties. External sources were verified in October 2026 and are listed in §8.</p>
+
+<h2>2. Reading list — in priority order</h2>
+
+<h3>2.1 Internal (read all four before writing code)</h3>
+<table>
+  <thead><tr><th style="width:26%">Document</th><th style="width:44%">Read for</th><th>Section that matters most</th></tr></thead>
+  <tr><td>01 — System Architecture</td><td>The seven bounded contexts, control vs. evaluation plane, data model, severity model</td><td>§7 failure modes &amp; mitigations; §10 explicit non-goals</td></tr>
+  <tr><td>02 — Flows &amp; SDLC Roadmap</td><td>Phase gates, the dry-run gate, spike pass/fail discipline</td><td>Flow 1 (evaluation pipeline), Flow 2 (onboarding)</td></tr>
+  <tr><td>03 — Product Designs</td><td>What the client portal must make self-evident to a non-security operator</td><td>Invariant editor + evidence viewer screens</td></tr>
+  <tr><td>04 — Tech Stack &amp; Chain Strategy</td><td>Chain order, finality states, cost model, 90-day build order</td><td>§2.1 finality policy; §9 build sequence</td></tr>
+</table>
+
+<h3>2.2 External — before the component that consumes it</h3>
+<table>
+  <thead><tr><th style="width:30%">Source</th><th style="width:38%">Why we read it</th><th>When</th></tr></thead>
+  <tr><td>Ethereum.org — Proof of Stake (slot/epoch/finality)</td><td>The correctness of our Ethereum finality policy depends on getting this exactly right</td><td>Week 1 — chain adapter</td></tr>
+  <tr><td>docs.base.org, docs.optimism.io, docs.arbitrum.io — finality &amp; sequencer pages</td><td>Safe/finalized semantics per L2; batch cadence assumptions we alert on</td><td>Week 1–2 — L2 adapter</td></tr>
+  <tr><td>L2BEAT — Layer 2 summary</td><td>Sequencer centralization and stage ratings we must not misrepresent in marketing</td><td>Quarterly — chain risk review</td></tr>
+  <tr><td>viem docs · BullMQ docs · Foundry Book (Anvil, cheatcodes)</td><td>The three libraries the evaluation plane is built on</td><td>Week 1 — spikes</td></tr>
+  <tr><td>Supabase — Row Level Security guidance (grants <em>and</em> policies)</td><td>RLS is our tenant boundary; the documented failure modes are the ones that leak data</td><td>Week 7 — tenancy</td></tr>
+  <tr><td>NIST SSDF SP 800-218 (v1.1)</td><td>Our CI/CD and vulnerability-handling practices, expressed as adoptable practices rather than a compliance project</td><td>Week 1 — repo/CI bootstrap</td></tr>
+  <tr><td>OWASP ASVS 5.0</td><td>The authorization, tenant-separation and API test checklist the portal/API must satisfy</td><td>Before API work — week 7</td></tr>
+  <tr><td>OWASP Top 10 (2025) · OWASP Smart Contract Top 10 (2025)</td><td>Developer awareness; the latter shapes which invariant categories our library must cover</td><td>Week 5 — invariant library</td></tr>
+  <tr><td>OpenZeppelin Contracts 5.x security docs · ethereum.org smart-contract security guide</td><td>Reference patterns (access control, proxies, reentrancy) behind the contracts clients monitor</td><td>Week 5 — spec authoring</td></tr>
+  <tr><td>Immunefi Severity Classification v2.3 · Code4rena submission guidelines</td><td>The evidence-pack format we borrow: location, impact, reproduction, stated severity criteria</td><td>Week 5–6 — evidence pack</td></tr>
+  <tr><td>FIRST CVSS v4.0 spec · MITRE CWE · CISA KEV</td><td>Severity for vulnerabilities in <em>our own</em> software and dependency triage — not for invariant breaches</td><td>Ongoing — vuln handling</td></tr>
+  <tr><td>OWASP Dependency-Track · OSV.dev · CISA SBOM hub · SLSA v1.2 build requirements</td><td>Supply-chain controls: SBOM per release, continuous dependency analysis, build provenance</td><td>Before first release</td></tr>
+  <tr><td>GDPR Art. 28/33 (consolidated) · EIOPA DORA overview</td><td>Alert routes contain personal data; EU fund buyers bring ICT third-party due diligence</td><td>Before Beta (GDPR) · Phase 3 (DORA contracts)</td></tr>
+</table>
+<div class="callout"><strong>Deliberately not on the list:</strong> SWC Registry (unmaintained since 2020 — legacy cross-reference only), tokenomics papers, and any vendor whitepaper claiming complete exploit detection. Secureum is useful training material, not a normative standard.</div>
+
+<div class="page-break"></div>
+<h2>3. Security risk register</h2>
+<p>Ranked by damage × likelihood for this specific product. Every risk names the gate that closes it; risks without a gate are risks we have decided to live with knowingly — and we do not have any of those.</p>
+<table>
+  <thead><tr><th style="width:5%">ID</th><th style="width:23%">Risk</th><th style="width:34%">Mitigation (built-in, not bolted on)</th><th>Closed at</th></tr></thead>
+  <tr><td>R1</td><td class="risk-h">False assurance</td><td>The worst failure mode: a protocol is "green" while insolvent. Mitigations: honest non-goals in all docs (Doc 01 §10), heartbeat dead-man on our own blindness, finality states exposed on every alert, detection-latency SLO published rather than implied.</td><td>Phase 1 gate</td></tr>
+  <tr><td>R2</td><td class="risk-h">Monitoring blind spot (RPC outage, reorg, provider split-view)</td><td>Two independent RPC vendors from day one with circuit breakers; degrade cadence instead of skipping; multi-provider head disagreement raises a data-quality alert; reorg triggers re-evaluation and loud retraction.</td><td>Phase 1 gate</td></tr>
+  <tr><td>R3</td><td class="risk-h">Tenant data leak via RLS gap</td><td><code>org_id</code> on every row; request-path DB role is never <code>service_role</code>; cross-tenant read/write probes are CI tests; pooled-connection transaction context reviewed; RLS pen-test is a Beta exit gate.</td><td>Phase 2 gate</td></tr>
+  <tr><td>R4</td><td>Spec author error → false-positive storm</td><td>Dry-run backfill over 7 days of history before arming; plans immutable and versioned; dedup + cooldown + per-route rate caps; anomaly channel never pages.</td><td>Onboarding flow (Doc 02 Flow 2)</td></tr>
+  <tr><td>R5</td><td class="risk-h">Supply-chain compromise (dependency, CI)</td><td>pnpm lockfile + <code>pnpm audit</code> in CI, Dependabot/Renovate with review gates, no unreviewed postinstall scripts, SBOM (CycloneDX) per release, SLSA v1.2 Build L1 provenance → L2, OIDC-only CI credentials.</td><td>Before first release</td></tr>
+  <tr><td>R6</td><td class="risk-h">Secret exposure (RPC keys, DB creds, webhook HMAC keys)</td><td>GitHub OIDC → cloud secret manager, zero long-lived CI keys; <code>age/SOPS</code>-encrypted config for local dev; provider keys scoped per chain and rotated quarterly; HMAC keys per route; secrets never logged (structured-log redaction enforced).</td><td>Week 1 bootstrap</td></tr>
+  <tr><td>R7</td><td class="risk-h">Insider compromise of Urmack</td><td><strong>No signing keys exist anywhere in the system</strong> — the maximum blast radius is false alerts, not stolen funds; read-only RPC credentials; append-only audit log on spec/route/severity changes with step-up re-auth; quarterly access review.</td><td>Continuous</td></tr>
+  <tr><td>R8</td><td>Alert-channel abuse: spoofed or phishing alerts to customers</td><td>HMAC-SHA256 signature + ±5 min timestamp window on every webhook; published verify snippets; alerts never carry auth links or credentials; fixed message shape so operators can recognize genuine Urmack alerts.</td><td>Week 5–6</td></tr>
+  <tr><td>R9</td><td>Evidence-pack tampering or loss</td><td>Immutable object storage, 90-day retention, 15-minute signed URLs, content hash recorded with the alert; export bundle for IR retainers.</td><td>Week 5–6</td></tr>
+  <tr><td>R10</td><td>Our own availability (a silent monitor is worse than none)</td><td>Evaluation SLO 99.9% of expected ticks measured in Grafana Cloud; dead-man alert on heartbeat; 24-hour shadow run gate on any evaluation-plane deploy.</td><td>Phase 1 gate</td></tr>
+  <tr><td>R11</td><td>Personal data in alert routes (GDPR)</td><td>Names, emails, channel identifiers and IPs are minimized and retention-bounded; processor agreement + subprocessor list before Beta; breach notification to controller without undue delay.</td><td>Phase 2 gate</td></tr>
+  <tr><td>R12</td><td>Reputation risk from overstated capability</td><td>Marketing language reviewed against Doc 01 §10: we sell economic-invariant monitoring, not complete exploit detection. L2 sequencer claims match L2BEAT stage, not aspiration.</td><td>Continuous</td></tr>
+</table>
+
+<div class="page-break"></div>
+<h2>4. Standards we focus on — adopt now vs. defer</h2>
+<p>For a 5–10 person team, standards are only useful where they change what we build. This is the cut.</p>
+<table>
+  <thead><tr><th style="width:26%">Standard / framework</th><th style="width:14%">Decision</th><th style="width:36%">What we take from it</th><th>Trigger / timing</th></tr></thead>
+  <tr><td><strong>NIST SSDF SP 800-218</strong></td><td><span class="badge">ADOPT NOW</span></td><td>Security ownership, protected build access, change review, release testing, vulnerability intake/response — practices folded into our existing CI, not a side project</td><td>Week 1 repo bootstrap</td></tr>
+  <tr><td><strong>OWASP ASVS 5.0</strong></td><td><span class="badge">ADOPT NOW</span></td><td>Requirement checklist for authn/authz, tenant separation, API + webhook handling; selected Level 1/2 controls traced to CI tests</td><td>Week 7 API + tenancy</td></tr>
+  <tr><td><strong>OWASP Top 10 (2025)</strong> + <strong>Smart Contract Top 10 (2025)</strong></td><td><span class="badge">ADOPT NOW</span></td><td>Developer awareness; smart-contract edition drives which invariant categories our library must ship</td><td>Ongoing / invariant library</td></tr>
+  <tr><td><strong>SLSA v1.2</strong></td><td><span class="badge">ADOPT NOW</span></td><td>Build L1 (provenance tied to release), targeting L2 (authenticated provenance, hosted build isolation)</td><td>Before first release</td></tr>
+  <tr><td><strong>SBOM</strong> (CISA minimum elements) + <strong>Dependency-Track/OSV</strong> scanning</td><td><span class="badge">ADOPT NOW</span></td><td>CycloneDX SBOM per release, continuous advisory scanning, patch/exception SLAs, KEV prioritized over raw CVSS</td><td>Before first release</td></tr>
+  <tr><td><strong>CVSS v4.0 + CWE</strong></td><td><span class="badge">ADOPT NOW</span></td><td>Score <em>and</em> vector for vulnerabilities in our own software; never used as the severity model for invariant breaches (see §4.1)</td><td>Ongoing</td></tr>
+  <tr><td><strong>OWASP SAMM 2.2</strong></td><td><span class="badge alt">LIGHTWEIGHT</span></td><td>Short baseline self-assessment, a few improvements per quarter; no formal maturity scoring yet</td><td>Quarterly</td></tr>
+  <tr><td><strong>GDPR</strong> (processor role)</td><td><span class="badge">ADOPT NOW</span></td><td>Processor terms, retention limits on alert payloads/logs, breach notice to controller without undue delay</td><td>Before Beta</td></tr>
+  <tr><td><strong>SOC 2 Type II</strong></td><td><span class="badge defer">DEFER → PHASE 3</span></td><td>Not legally triggered by size — it is buyer-triggered. 6–12 months incl. observation window; ~$12–20k audit fees plus readiness. Start readiness only when a design partner's procurement demands it</td><td>Trigger: enterprise deal</td></tr>
+  <tr><td><strong>ISO/IEC 27001:2022</strong></td><td><span class="badge defer">DEFER</span></td><td>Keep a lightweight risk-based ISMS (this document is its seed); accredited certification only if EU/international buyers value it over SOC 2</td><td>Trigger: buyer demand</td></tr>
+  <tr><td><strong>EU DORA</strong></td><td><span class="badge defer">MONITOR</span></td><td>In force since Jan 2025; we are not automatically in scope, but as an ICT provider to EU financial entities expect due-diligence, incident-cooperation and exit clauses in contracts — prepare the paperwork, not a compliance program</td><td>Phase 3 EU deals</td></tr>
+  <tr><td><strong>NIS2</strong></td><td><span class="badge defer">MONITOR</span></td><td>Scope depends on our own service category and national implementation; do not assume "SaaS vendor" qualifies. Re-check before EU expansion</td><td>Advisory</td></tr>
+</table>
+
+<h3>4.1 Severity model alignment</h3>
+<p>Two vocabularies, never conflated: <strong>CVSS v4.0 + CWE</strong> for vulnerabilities in our own software and dependencies, and our own <strong>Critical / Warning / Anomaly</strong> economic severity (Doc 01 §6) for invariant breaches — a breach may deserve a Critical page with no CVE in existence. Following Immunefi/Code4rena reporting discipline, every alert carries: affected chain and contract, invariant with expected vs. observed values, block/transaction references, reproduction inputs, confidence and stated limitations, and a private response route. <strong>Observed breach, potential exploit, and monitoring/data-quality failure are three distinct labels</strong> and never share an alert without saying which is which.</p>
+
+<div class="page-break"></div>
+<h2>5. Security measures we build with</h2>
+<div class="two-col">
+  <div>
+    <h3>Platform &amp; tenancy</h3>
+    <ul>
+      <li>Postgres RLS on every table; <code>org_id</code> scoping; no <code>service_role</code> in request context</li>
+      <li>Cross-tenant isolation tests in CI; RLS pen-test as a Phase 2 gate</li>
+      <li>Supabase Auth (magic link → passkeys → SSO); HTTP-only session cookies; step-up re-auth for routing/severity changes</li>
+      <li>Per-org API rate limits; per-route alert rate caps</li>
+      <li><code>Cache-Control: no-store</code> on all tenant-bearing responses</li>
+    </ul>
+    <h3>Keys &amp; secrets</h3>
+    <ul>
+      <li><strong>No signing material anywhere</strong> — read-only RPC credentials only, scoped per chain</li>
+      <li>GitHub OIDC → cloud secret manager; no long-lived CI keys</li>
+      <li>age/SOPS encrypted local config; quarterly rotation; per-route webhook HMAC keys</li>
+    </ul>
+    <h3>Supply chain</h3>
+    <ul>
+      <li>Lockfile pinning, <code>pnpm audit</code>, Dependabot with review gates</li>
+      <li>CycloneDX SBOM per release + VEX notes for non-affected advisories</li>
+      <li>SLSA v1.2 L1 provenance (→ L2), OIDC-issued build identities</li>
+      <li>KEV-first prioritization for dependency patches; patch SLA by severity</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Application</h3>
+    <ul>
+      <li>ASVS-traced tests: authn, authz, tenant separation, input validation on spec YAML</li>
+      <li>Zod validation at every trust boundary; typed ABIs — no runtime <code>eval</code> of client specs</li>
+      <li>Spec compiler sandboxes assertion evaluation; plans immutable + checksummed</li>
+      <li>Webhook signing with timestamp window; published verify snippets (JS/Python/Go)</li>
+      <li>Structured logging with secret redaction; no payload bodies in logs</li>
+    </ul>
+    <h3>Operations</h3>
+    <ul>
+      <li>OpenTelemetry + evaluation SLO (99.9% of expected ticks); dead-man heartbeat</li>
+      <li>24-hour shadow-run gate for evaluation-plane deploys</li>
+      <li>PITR Postgres backups, cross-region evidence replication, quarterly restore drill</li>
+      <li>Append-only audit log; quarterly access review</li>
+      <li>Incident runbook with severity-1 path and customer notification templates</li>
+    </ul>
+    <h3>Data &amp; disclosure</h3>
+    <ul>
+      <li>Evidence packs immutable, 90-day retention, 15-min signed URLs, content hash on alert</li>
+      <li>Processor terms + subprocessor list before Beta; retention limits on route payloads</li>
+      <li>Public security contact (<code>security@</code>) with a published disclosure policy (90-day coordinated)</li>
+      <li>Never publish exploitable detail before the protocol has patched</li>
+    </ul>
+  </div>
+</div>
+
+<h2>6. Compliance timeline (what happens when, and what triggers it)</h2>
+<table>
+  <thead><tr><th style="width:16%">Phase</th><th style="width:46%">Security deliverables</th><th>Gate</th></tr></thead>
+  <tr><td>Phase 0 — Spike</td><td>Secrets bootstrap (OIDC, SOPS), SSDF ownership assigned, CI with lint/typecheck/tests + dependency audit</td><td>Repo green</td></tr>
+  <tr><td>Phase 1 — Alpha</td><td>ASVS-mapped API tests, RPC-key scoping, RLS policies + cross-tenant CI probes, IR runbook v1, honest-capability docs review</td><td>30-day correct-evaluation run; zero cross-tenant findings</td></tr>
+  <tr><td>Phase 2 — Beta</td><td>RLS pen-test, SBOM per release, SLSA L1 provenance, GDPR processor terms, disclosure policy published, restore drill</td><td>Pen-test passed (Doc 01 §2)</td></tr>
+  <tr><td>Phase 3 — GA</td><td>SOC 2 readiness assessment → Type II fieldwork if buyer-triggered; DORA contract clauses for EU financial entities; SLSA L2</td><td>Enterprise deal closure</td></tr>
+</table>
+
+<h2>7. Disclosure &amp; incident response duties</h2>
+<ul>
+  <li><strong>A vulnerability in Urmack</strong> (e.g. an RLS bypass): coordinated disclosure page, 90-day clock, customer notification with evidence of containment; if customer personal data is affected, notify controllers without undue delay.</li>
+  <li><strong>A breach detected in a customer's protocol</strong> (our product working): severity-classified alert + evidence pack, IR playbook attach, and — per our disclosure principles — no public detail until the protocol acts.</li>
+  <li><strong>Our own monitoring failure</strong> (blind spot): heartbeat dead-man alert, customer notification, post-incident write-up. Reporting our own failures is the trust behavior competitors selling fear cannot copy.</li>
+</ul>
+
+<h2>8. Sources</h2>
+<p class="src">
+Standards &amp; compliance: csrc.nist.gov/projects/ssdf (SP 800-218 v1.1) · owasp.org/projects/asvs (5.0) · owasp.org/projects/top-ten (2025) · owasp.org/projects/smart-contract-top-10 · owasp.org/projects/samm (2.2) · slsa.dev/spec/v1.2/ · cisa.gov/topics/…/sbom (2026 minimum-elements updates) · owasp.org/projects/dependency-track · osv.dev · cisa.gov/known-exploited-vulnerabilities-catalog · aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services · drata.com/learn/soc-2/cost (planning ranges, not market prices) · iso.org/standard/27001<br>
+Severity &amp; disclosure: first.org/cvss/specification-document (CVSS v4.0) · cwe.mitre.org · immunefi.com/immunefi-vulnerability-severity-classification-system-v2-3/ · docs.code4rena.com/competitions/submission-guidelines · swcregistry.io (legacy since 2020)<br>
+Regulation: eur-lex.europa.eu CELEX 32022R2554 (DORA) · eiopa.europa.eu DORA overview · eur-lex.europa.eu CELEX 32022L2555 (NIS2) · digital-strategy.ec.europa.eu NIS2 update (Jan 2026 proposal — verify national enactment) · eur-lex.europa.eu CELEX 02016R0679 (GDPR, Art. 28/33)<br>
+Chain &amp; contract security: ethereum.org/developers/docs/smart-contracts/security/ · docs.openzeppelin.com/contracts/5.x/ · l2beat.com/layer2s/summary · ethereum.org/developers/docs/consensus-mechanisms/pos/
+</p>
+
+<div class="footer-note">Urmack Watch — Pre-Build Reading &amp; Security Playbook · v1.0 · 16 Oct 2026 · Companion: 01 System Architecture, 02 Flows &amp; SDLC Roadmap, 03 Product Designs, 04 Tech Stack &amp; Chain Strategy</div>
+
+</body>
+</html>

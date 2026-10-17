@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Urmack Watch — System Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap');
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; color: #1c2420; font-size: 10.5pt; line-height: 1.55; margin: 0; }
+  h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; color: #101413; letter-spacing: -.02em; }
+  h1 { font-size: 22pt; margin: 0 0 4px; }
+  h2 { font-size: 14pt; border-bottom: 2px solid #b7ff5a; padding-bottom: 5px; margin: 26px 0 12px; page-break-after: avoid; }
+  h3 { font-size: 11pt; margin: 18px 0 6px; color: #2a322e; page-break-after: avoid; }
+  p { margin: 6px 0; }
+  ul, ol { margin: 6px 0; padding-left: 22px; }
+  li { margin: 3px 0; }
+  code, .mono { font-family: 'JetBrains Mono', monospace; font-size: 8.8pt; }
+  code { background: #eef1ea; padding: 1px 5px; border-radius: 3px; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt; page-break-inside: avoid; }
+  th { background: #101413; color: #f1f4ee; text-align: left; padding: 7px 9px; font-family: 'JetBrains Mono', monospace; font-size: 8pt; letter-spacing: .06em; text-transform: uppercase; font-weight: 500; }
+  td { border-bottom: 1px solid #d5dbd2; padding: 7px 9px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f6f8f2; }
+  .cover { text-align: left; padding: 90px 0 40px; }
+  .cover .tag { font-family: 'JetBrains Mono', monospace; font-size: 9pt; letter-spacing: .22em; color: #5c6b60; text-transform: uppercase; }
+  .cover .tagline { font-size: 13pt; color: #3c453f; margin-top: 14px; max-width: 480px; }
+  .cover .meta { margin-top: 60px; font-size: 9pt; color: #5c6b60; }
+  .cover .meta div { margin: 2px 0; }
+  .callout { border-left: 4px solid #b7ff5a; background: #f2f7e8; padding: 10px 14px; margin: 12px 0; page-break-inside: avoid; }
+  .callout.warn { border-left-color: #d97b3a; background: #faf1e9; }
+  .callout strong { font-family: 'Space Grotesk', sans-serif; }
+  .badge { display: inline-block; background: #101413; color: #b7ff5a; font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; padding: 2px 8px; border-radius: 3px; letter-spacing: .08em; vertical-align: middle; }
+  .page-break { page-break-before: always; }
+  .arch-box { border: 1.5px solid #101413; border-radius: 6px; padding: 10px 12px; margin: 8px 0; page-break-inside: avoid; }
+  .arch-box .name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 10.5pt; }
+  .arch-box .name .badge { margin-left: 8px; }
+  .arch-box p { margin: 4px 0 0; font-size: 9.3pt; color: #3c453f; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .footer-note { margin-top: 34px; padding-top: 10px; border-top: 1px solid #d5dbd2; font-size: 8pt; color: #5c6b60; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="tag">Urmack · Flagship Product · Confidential</div>
+  <h1>Urmack Watch</h1>
+  <p class="tagline">Continuous economic-invariant monitoring for DeFi protocols. Clients declare invariants once; Urmack Watch evaluates them against on-chain state every block-interval and alerts, with evidence, the moment one breaks.</p>
+  <div class="meta">
+    <div><strong>Document</strong> 01 — System Architecture</div>
+    <div><strong>Companion documents</strong> 02 — Flows &amp; SDLC Roadmap · 03 — Product Designs</div>
+    <div><strong>Version</strong> 1.0 · 16 October 2026</div>
+    <div><strong>Author</strong> Office of the Interim CTO, Urmack</div>
+    <div><strong>Status</strong> Approved for build — Phase 0 begins on signature</div>
+  </div>
+</section>
+
+<div class="page-break"></div>
+<h2>1. Product definition</h2>
+<p><strong>Problem.</strong> Audits are point-in-time. Between engagements, protocols drift: an upgrade shifts accounting, an oracle degrades, a privileged role is abused, liquidity hollows out. Existing monitoring (Forta-style node alerting, Tenderly alerts) watches <em>transactions and log patterns</em>; it does not evaluate whether the protocol's economic rules still hold.</p>
+<p><strong>Product.</strong> A multi-tenant SaaS where a protocol team declares <em>invariants</em> — properties that must always be true (solvency, share-price bounds, collateral ratios, conservation of funds) — and Urmack Watch continuously evaluates them against live chain state. A breach produces a severity-classified alert with a full evidence pack, not a raw log line.</p>
+<p><strong>Buyer.</strong> Protocol founders/CTOs, DAO security working groups, and (Tier 3) funds buying portfolio coverage.</p>
+<p><strong>Mooat.</strong> Urmack's research practice supplies the invariant library and the economic reasoning behind severity classification — the part general-purpose monitoring cannot commoditize.</p>
+
+<h2>2. SDLC selection</h2>
+<p>Three candidate methodologies were evaluated for a flagship SaaS built by a small team:</p>
+<table>
+  <tr><th style="width:18%">Method</th><th style="width:41%">Fit assessment</th><th>Verdict</th></tr>
+  <tr><td>Waterfall</td><td>Requirements for a monitoring product cannot be fully known before live-protocol feedback; long feedback cycles are fatal for a first-of-kind economic monitoring engine.</td><td>Rejected</td></tr>
+  <tr><td>Pure Scrum</td><td>Good cadence, but Sprint boundaries alone do not force early confrontation of the highest-risk unknowns (RPC reliability, invariant expressiveness).</td><td>Rejected as primary</td></tr>
+  <tr><td><strong>Iterative-incremental, risk-driven</strong> (Agile delivery cadence + explicit architecture-risk spikes per phase)</td><td>Delivers a walking skeleton early, forces the riskiest engineering (chain adapters, spec language, evaluation engine) through time-boxed spikes <em>before</em> feature investment, and keeps each increment demoable to a design partner.</td><td><strong>Selected</strong></td></tr>
+</table>
+<div class="callout"><strong>Selected SDLC — Iterative &amp; Incremental with risk-driven spikes.</strong> Four phases, each ending in a demoable release and a hard gate. spikes are time-boxed (≤2 weeks) engineering experiments with explicit pass/fail criteria; a failed spike re-plans the phase rather than being absorbed silently.</div>
+<table>
+  <tr><th style="width:12%">Phase</th><th style="width:26%">Goal</th><th>Exit gate</th></tr>
+  <tr><td>0 — Spike</td><td>Kill the top-3 technical risks</td><td>All spikes pass criteria or phase is re-planned; walking skeleton runs one invariant on one chain</td></tr>
+  <tr><td>1 — Alpha</td><td>Real monitoring for one design partner</td><td>30 consecutive days of correct evaluations; alert delivered &lt; 60 s after induced breach</td></tr>
+  <tr><td>2 — Beta</td><td>Self-serve onboarding, 5–10 protocols</td><td>Onboarding &lt; 30 min without Urmack involvement; billing live; RLS pen-test passed</td></tr>
+  <tr><td 3>3 — GA</td><td>Portfolio tier, multi-chain, public launch</td><td>99.9% evaluation availability over 30 days; IR escalation integration</td></tr>
+</table>
+
+<h2>3. System architecture</h2>
+<p>Seven bounded contexts. Every component is independently deployable; the evaluation plane (3–6) is isolated from the control plane (1–2, 7) so portal traffic can never starve monitoring.</p>
+
+<div class="arch-box"><div class="name">1 · Control API <span class="badge">CONTROL PLANE</span></div><p>REST/JSON API for orgs, users, protocols, contracts, invariant specs and notification routes. Supabase Auth (magic link → later SSO) + Postgres with row-level security as the hard multi-tenant boundary.</p></div>
+<div class="arch-box"><div class="name">2 · Onboarding &amp; Spec Compiler <span class="badge">CONTROL PLANE</span></div><p>Validates addresses/ABIs, resolves proxy implementations, compiles the human-readable invariant spec (YAML) into an <em>evaluation plan</em>: the exact <code>eth_call</code> batch, storage reads, event queries and the assertion function. Runs a <em>dry-run backfill</em> over N historical days to prove the invariant before arming.</p></div>
+<div class="arch-box"><div class="name">3 · Scheduler <span class="badge">EVALUATION PLANE</span></div><p>Block-height-driven tick service (per chain). Emits evaluation jobs per protocol/plan at the subscription cadence (Tier 1: 5-min · Tier 2: per-block). Guarantees exactly-one-in-flight per plan via Redis locks; missed ticks feed the heartbeat (§7).</p></div>
+<div class="arch-box"><div class="name">4 · Chain Data Layer <span class="badge">EVALUATION PLANE</span></div><p>Multi-provider RPC pool (Alchemy/QuickNode + fallback) with per-chain adapters, confirmation-depth handling (default 2 blocks L1 / 1 block L2), reorg detection, and a cached ABI/implementation registry. Read-only keys only — the product never holds signing material.</p></div>
+<div class="arch-box"><div class="name">5 · Snapshot &amp; Evaluation Engine <span class="badge">EVALUATION PLANE</span></div><p>Builds a consistent state snapshot per tick (batched <code>eth_call</code> + event window), then executes the compiled assertions: point-in-time, temporal ("X holds for N consecutive blocks"), and derived-metric checks (ratios, share-price math). Emits <code>EvaluationResult{plan, block, values, pass, margin}</code>.</p></div>
+<div class="arch-box"><div class="name">6 · Detection, Severity &amp; Alert Router <span class="badge">EVALUATION PLANE</span></div><p>Classifies breaches (Critical / Warning / Anomaly per §6), applies dedup + cooldown (no alert storms), packages the evidence pack (§8), and routes to channels: webhook (HMAC-signed), Telegram, Discord, Slack, PagerDuty, email — WhatsApp via Cloud API on the premium tier.</p></div>
+<div class="arch-box"><div class="name">7 · Client Portal <span class="badge">CONTROL PLANE</span></div><p>Next.js app: protocol health dashboard, invariant editor with live dry-run, alert history with evidence viewer, routing config, team management. Read/write only through the Control API.</p></div>
+
+<h3>Supporting data services</h3>
+<ul>
+  <li><strong>Postgres (Supabase, RLS)</strong> — tenancy, specs, plans, alert records, audit log.</li>
+  <li><strong>TimescaleDB hypertables</strong> — every <code>EvaluationResult</code> (pass or fail) as time-series: powers margin charts ("how close did we come?") and post-incident timelines.</li>
+  <li><strong>Redis</strong> — tick locks, provider circuit breakers, hot ABI cache.</li>
+  <li><strong>Object store (S3/R2)</strong> — evidence packs (immutable, 90-day retention; exportable for IR retainers).</li>
+</ul>
+
+<div class="page-break"></div>
+<h2>4. Data model (core entities)</h2>
+<table>
+  <tr><th style="width:22%">Entity</th><th>Key fields</th><th style="width:30%">Notes</th></tr>
+  <tr><td><code>org</code></td><td>id, name, plan_tier, billing_status</td><td>Tenancy root; every row below carries <code>org_id</code> for RLS</td></tr>
+  <tr><td><code>protocol</code></td><td>id, org_id, name, category, primary_chain</td><td>One monitored protocol</td></tr>
+  <tr><td><code>contract</code></td><td>id, protocol_id, chain, address, abi_ref, proxy_impl</td><td>Implementation-change watcher attached here</td></tr>
+  <tr><td><code>invariant_spec</code></td><td>id, protocol_id, yaml_source, kind, severity, cadence, status</td><td>Source of truth; compiled plans reference it</td></tr>
+  <tr><td><code>eval_plan</code></td><td>id, spec_id, compiled_json, version, checksum</td><td>Immutable per version — audits what ran</td></tr>
+  <tr><td><code>evaluation</code></td><td>plan_id, block, ts, values, pass, margin</td><td>Timescale hypertable; never deleted</td></tr>
+  <tr><td><code>alert</code></td><td>id, spec_id, severity, block, status, evidence_uri</td><td>status: open → acked → resolved / false-positive</td></tr>
+  <tr><td><code>route</code></td><td>id, org_id, channel, config, severity_filter</td><td>Secrets stored encrypted; webhook HMAC key per route</td></tr>
+  <tr><td><code>heartbeat</code></td><td>protocol_id, last_eval_ts, expected_interval</td><td>Drives dead-man monitoring of the monitor</td></tr>
+</table>
+
+<h2>5. Technology stack</h2>
+<table>
+  <tr><th style="width:24%">Layer</th><th style="width:34%">Choice</th><th>Rationale</th></tr>
+  <tr><td>Portal</td><td>Next.js + TypeScript (strict) + Tailwind</td><td>Master-prompt house stack; RSC keeps client JS small</td></tr>
+  <tr><td>API</td><td>Hono on Node (or Cloudflare Workers)</td><td>Fetch-standard, typed, deployable anywhere</td></tr>
+  <tr><td>Evaluation workers</td><td>TypeScript + viem, BullMQ on Redis</td><td>viem's typed ABIs; queue gives retries/backpressure</td></tr>
+  <tr><td>Spec language</td><td>YAML → JSON-Schema → compiled plan (Zod-validated)</td><td>Human-readable, formally checkable, versionable</td></tr>
+  <tr><td>Storage</td><td>Supabase Postgres + TimescaleDB, S3/R2 evidence</td><td>Existing Supabase relationship; RLS = tenancy for free</td></tr>
+  <tr><td>Alerting</td><td>Webhooks (HMAC), Telegram, Discord, Slack, PagerDuty, WhatsApp Cloud API</td><td>Buyer's existing on-call workflows</td></tr>
+  <tr><td>Observability</td><td>OpenTelemetry → Grafana Cloud; dead-man alerts on the scheduler itself</td><td>A monitor that fails silently is worse than none</td></tr>
+</table>
+
+<h2>6. Severity model</h2>
+<table>
+  <tr><th style="width:14%">Severity</th><th style="width:42%">Definition</th><th>Default response</th></tr>
+  <tr><td><strong>Critical</strong></td><td>Solvency, conservation or access-control invariant broken at finality depth. Funds are (or may be) at risk <em>now</em>.</td><td>All routes + PagerDuty/WhatsApp immediately; IR playbook attach</td></tr>
+  <tr><td><strong>Warning</strong></td><td>Margin erosion: invariant still holds but crossed a configured safety band (e.g. collateral ratio within 5% of limit).</td><td>Business-hours routes; digest if repeated</td></tr>
+  <tr><td><strong>Anomaly</strong></td><td>Statistical deviation from the spec's own 30-day baseline (share price jump, TVL outflow).</td><td>Digest; no paging</td></tr>
+</table>
+
+<h2>7. Failure modes &amp; mitigations</h2>
+<table>
+  <tr><th style="width:26%">Failure</th><th>Mitigation</th></tr>
+  <tr><td>RPC provider outage</td><td>Multi-provider pool with circuit breakers; degrade cadence rather than skip; if no evaluation within 3× expected interval, <strong>heartbeat dead-man alert</strong> — the monitor reports its own blindness.</td></tr>
+  <tr><td>Chain reorg</td><td>Finality depth per chain (configurable); breach alerts wait for depth, sub-depth violations recorded as pending.</td></tr>
+  <tr><td>Spec author error</td><td>Dry-run backfill (§2) before arming; plans are versioned and immutable; changing a spec never rewrites history.</td></tr>
+  <tr><td>False-positive storm</td><td>Dedup + cooldown + per-route rate caps; anomaly channel never pages.</td></tr>
+  <tr><td>Tenant data leak</td><td>Postgres RLS on every table; evidence objects signed-URL only; quarterly access review; RLS pen-test is a Beta gate.</td></tr>
+  <tr><td>Insider compromise of Urmack</td><td>No signing keys ever stored; read-only RPC credentials scoped per provider; alert routing changes require org-owner re-auth and are audit-logged.</td></tr>
+</table>
+
+<h2>8. Evidence pack (the product's differentiator)</h2>
+<p>Every Critical/Warning alert ships a signed, self-contained bundle: (1) breached invariant in human language + raw spec, (2) evaluated values vs. thresholds at breach block, (3) 24 h margin time-series, (4) the triggering transaction(s) with decoded traces, (5) recent privileged events on in-scope contracts, (6) Uremack first-checks playbook. This is the artifact that turns an alert into an engagement and feeds the IR retainer upsell.</p>
+
+<h2>9. Scaling path</h2>
+<p>v1: single evaluation worker pool, protocol-level partition keys. v2: per-chain partitions, snapshot caching across protocols sharing an RPC provider, spec-level precomputation. v3: portfolio tier — one evaluation pass amortized across funds' overlapping protocol sets. Timeseries retention: full resolution 90 d, hourly rollup 2 y (hypertable policies).</p>
+
+<h2>10. Explicit non-goals (v1)</h2>
+<ul>
+  <li>No transaction simulation or auto-response (no signing material — ever).</li>
+  <li>No off-chain data sources (CEX prices, team comms) — on-chain state only, stated plainly in docs.</li>
+  <li>No claim of complete exploit detection. The docs will say what the product does and does not see, matching Urmack's disclosure principles.</li>
+</ul>
+
+<div class="footer-note">Urmack Watch — System Architecture · v1.0 · 16 Oct 2026 · Companion: 02 Flows &amp; SDLC Roadmap, 03 Product Designs</div>
+
+</body>
+</html>

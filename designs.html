@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Urmack Watch — Product Designs</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap');
+  @page { size: A4 landscape; margin: 12mm 12mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; color: #1c2420; font-size: 10pt; margin: 0; background: #fff; }
+  h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; color: #101413; letter-spacing: -.02em; }
+  h1 { font-size: 20pt; margin: 0 0 3px; }
+  h2 { font-size: 13pt; border-bottom: 2px solid #b7ff5a; padding-bottom: 4px; margin: 0 0 6px; }
+  .sub { color: #5c6b60; font-size: 9pt; margin: 0 0 10px; }
+  .page-break { page-break-before: always; }
+  .footer-note { margin-top: 12px; padding-top: 8px; border-top: 1px solid #d5dbd2; font-size: 8pt; color: #5c6b60; }
+
+  /* ===== mockup chrome ===== */
+  .frame { border: 1.5px solid #101413; border-radius: 10px; overflow: hidden; background: #101413; }
+  .frame-caption { display: flex; justify-content: space-between; font: 8.5pt 'JetBrains Mono', monospace; color: #5c6b60; margin: 6px 0 0; letter-spacing: .05em; }
+  .app { background: #101413; color: #f1f4ee; font-size: 9pt; }
+  .app-topbar { display: flex; align-items: center; gap: 14px; padding: 10px 16px; border-bottom: 1px solid #2c3531; }
+  .logo-mark { width: 22px; height: 22px; border: 1px solid #b7ff5a; color: #b7ff5a; display: grid; place-items: center; font-family: 'Space Grotesk'; font-weight: 700; font-size: 12px; }
+  .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: .08em; font-size: 10px; }
+  .brand small { display: block; font: 6.5px 'JetBrains Mono', monospace; color: #929e97; letter-spacing: .18em; }
+  .topnav { display: flex; gap: 16px; margin-left: 20px; font: 8.5px 'JetBrains Mono', monospace; color: #929e97; text-transform: uppercase; letter-spacing: .08em; }
+  .topnav .on { color: #f1f4ee; border-bottom: 2px solid #b7ff5a; padding-bottom: 8px; }
+  .topbar-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+  .chip { font: 8px 'JetBrains Mono', monospace; padding: 3px 8px; border-radius: 3px; border: 1px solid #2c3531; color: #929e97; }
+  .chip.lime { border-color: #b7ff5a; color: #b7ff5a; }
+  .btn-lime { background: #b7ff5a; color: #101413; font: 600 8.5px 'Inter'; padding: 6px 12px; border-radius: 3px; }
+  .avatar { width: 22px; height: 22px; border-radius: 50%; background: #202725; border: 1px solid #2c3531; display: grid; place-items: center; font-size: 8px; color: #929e97; }
+
+  .app-body { display: grid; grid-template-columns: 150px 1fr; min-height: 430px; }
+  .sidebar { border-right: 1px solid #2c3531; padding: 14px 12px; font: 8.5px 'JetBrains Mono', monospace; color: #929e97; }
+  .sidebar .sect { color: #565e58; font-size: 7px; letter-spacing: .16em; margin: 12px 0 6px; }
+  .sidebar .item { padding: 5px 8px; border-radius: 3px; margin: 1px 0; }
+  .sidebar .item.on { background: #202725; color: #f1f4ee; border-left: 2px solid #b7ff5a; }
+  .main { padding: 16px 18px; }
+
+  .hrow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .hrow h3 { font-size: 14px; margin: 0; color: #f1f4ee; }
+  .crumb { font: 8px 'JetBrains Mono', monospace; color: #565e58; margin-bottom: 3px; }
+
+  .statgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+  .stat { background: #161b19; border: 1px solid #2c3531; border-radius: 6px; padding: 10px 12px; }
+  .stat .k { font: 7.5px 'JetBrains Mono', monospace; color: #929e97; letter-spacing: .1em; text-transform: uppercase; }
+  .stat .v { font-family: 'Space Grotesk'; font-size: 20px; font-weight: 600; margin-top: 4px; }
+  .stat .v.lime { color: #b7ff5a; }
+  .stat .v.amber { color: #e0a53f; }
+  .stat .v.red { color: #ff6b5e; }
+  .stat .d { font-size: 8px; color: #565e58; margin-top: 2px; }
+
+  table.mock { width: 100%; border-collapse: collapse; font-size: 8.5px; }
+  table.mock th { font: 7.5px 'JetBrains Mono', monospace; color: #565e58; text-transform: uppercase; letter-spacing: .1em; text-align: left; padding: 6px 8px; border-bottom: 1px solid #2c3531; }
+  table.mock td { padding: 7px 8px; border-bottom: 1px solid #1d2421; color: #d8ded7; vertical-align: middle; }
+  table.mock .mono { font-family: 'JetBrains Mono', monospace; font-size: 8px; }
+  .sev { font: 7.5px 'JetBrains Mono', monospace; padding: 2px 7px; border-radius: 3px; }
+  .sev.crit { background: rgba(255,107,94,.14); color: #ff6b5e; border: 1px solid rgba(255,107,94,.4); }
+  .sev.warn { background: rgba(224,165,63,.12); color: #e0a53f; border: 1px solid rgba(224,165,63,.35); }
+  .sev.info { background: rgba(146,158,151,.12); color: #929e97; border: 1px solid #2c3531; }
+  .sev.ok { background: rgba(183,255,90,.1); color: #b7ff5a; border: 1px solid rgba(183,255,90,.35); }
+
+  .spark { display: inline-block; vertical-align: middle; }
+  .marginbar { width: 90px; height: 5px; background: #202725; border-radius: 3px; display: inline-block; position: relative; vertical-align: middle; }
+  .marginbar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: #b7ff5a; }
+  .marginbar i.amber { background: #e0a53f; }
+  .marginbar i.red { background: #ff6b5e; }
+
+  .editor { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
+  .panel { background: #161b19; border: 1px solid #2c3531; border-radius: 6px; padding: 12px; }
+  .panel h4 { font: 7.5px 'JetBrains Mono', monospace; color: #929e97; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 8px; }
+  .code { background: #0c100e; border: 1px solid #1d2421; border-radius: 5px; padding: 10px 12px; font: 8px/1.65 'JetBrains Mono', monospace; color: #d8ded7; white-space: pre; }
+  .code .k { color: #929e97; }
+  .code .s { color: #b7ff5a; }
+  .code .n { color: #e0a53f; }
+  .code .c { color: #565e58; }
+
+  .tmpl { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .tmpl span { font: 7.5px 'JetBrains Mono', monospace; border: 1px solid #2c3531; color: #929e97; padding: 4px 8px; border-radius: 3px; }
+  .tmpl span.on { border-color: #b7ff5a; color: #b7ff5a; }
+
+  .chart { height: 96px; position: relative; border-left: 1px solid #2c3531; border-bottom: 1px solid #2c352f; margin: 6px 0 4px; }
+  .chart .thresh { position: absolute; left: 0; right: 0; border-top: 1.5px dashed #ff6b5e; }
+  .chart .thresh span { position: absolute; right: 2px; top: -13px; font: 7px 'JetBrains Mono', monospace; color: #ff6b5e; }
+  .chart .band { position: absolute; left: 0; right: 0; border-top: 1px dashed #e0a53f; }
+  .chart .band span { position: absolute; right: 2px; top: -12px; font: 7px 'JetBrains Mono', monospace; color: #e0a53f; }
+
+  .evidence { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .kv { display: grid; grid-template-columns: 110px 1fr; gap: 3px 8px; font-size: 8.5px; }
+  .kv dt { color: #565e58; font: 7.5px 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .08em; padding-top: 1px; }
+  .kv dd { margin: 0; color: #d8ded7; font-family: 'JetBrains Mono', monospace; font-size: 8px; }
+  .playbook li { font-size: 8.5px; color: #d8ded7; margin: 4px 0; }
+  .playbook { margin: 4px 0 0; padding-left: 16px; }
+
+  .steps { display: flex; gap: 0; margin-bottom: 12px; border: 1px solid #2c3531; border-radius: 6px; overflow: hidden; }
+  .step { flex: 1; padding: 8px 10px; font: 8px 'JetBrains Mono', monospace; color: #565e58; border-right: 1px solid #2c3531; }
+  .step:last-child { border-right: 0; }
+  .step .num { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; border: 1px solid #2c3531; margin-right: 6px; font-size: 7.5px; }
+  .step.done { color: #929e97; }
+  .step.done .num { background: #b7ff5a; border-color: #b7ff5a; color: #101413; }
+  .step.on { color: #f1f4ee; background: #161b19; }
+  .step.on .num { border-color: #b7ff5a; color: #b7ff5a; }
+
+  .field { margin-bottom: 9px; }
+  .field label { display: block; font: 7.5px 'JetBrains Mono', monospace; color: #929e97; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+  .field .input { background: #202725; border: 1px solid #2c3531; border-radius: 3px; padding: 7px 9px; font: 8.5px 'JetBrains Mono', monospace; color: #d8ded7; }
+  .field .input.dim { color: #565e58; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .dryrun { border: 1px solid rgba(183,255,90,.35); background: rgba(183,255,90,.05); border-radius: 6px; padding: 10px 12px; margin-top: 4px; }
+  .dryrun .t { font: 8px 'JetBrains Mono', monospace; color: #b7ff5a; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+  .dryrun .row { display: flex; justify-content: space-between; font: 8px 'JetBrains Mono', monospace; color: #d8ded7; padding: 2px 0; }
+
+  .annot { margin: 8px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .annot li { font-size: 8.5pt; color: #3c453f; border-left: 3px solid #b7ff5a; padding-left: 8px; }
+  .annot strong { font-family: 'Space Grotesk'; display: block; color: #101413; }
+</style>
+</head>
+<body>
+
+<h1>Urmack Watch — Product Designs</h1>
+<p class="sub">v1.0 · 16 Oct 2026 · Four core screens, designed in the Urmack system (Obsidian / Signal Lime / Graphite · Space Grotesk / Inter / JetBrains Mono). These are design specifications for build, not screenshots of working software.</p>
+
+<div class="page-break"></div>
+<h2>Screen 1 — Protocol health dashboard</h2>
+<p class="sub">Landing screen after sign-in. Answers "is anything at risk right now?" in under three seconds: global status, margin pressure, live alert feed. Margins — not just pass/fail — are the product's core visual language.</p>
+<div class="frame">
+  <div class="app">
+    <div class="app-topbar">
+      <div class="logo-mark">U</div>
+      <div class="brand">URMACK<small>WATCH</small></div>
+      <div class="topnav"><span class="on">Dashboard</span><span>Invariants</span><span>Alerts</span><span>Contracts</span><span>Settings</span></div>
+      <div class="topbar-right"><span class="chip lime">● LIVE · block 21,048,332</span><span class="chip">Tier 2 · per-block</span><div class="avatar">KM</div></div>
+    </div>
+    <div class="app-body">
+      <div class="sidebar">
+        <div class="sect">PROTOCOLS</div>
+        <div class="item on">◆ Helix Lending</div>
+        <div class="item">◇ Meridian Vault</div>
+        <div class="item">◇ KiteSwap AMM</div>
+        <div class="sect">VIEWS</div>
+        <div class="item">Timeline</div>
+        <div class="item">Evidence packs</div>
+        <div class="item">Heartbeats</div>
+        <div class="item">Routing</div>
+      </div>
+      <div class="main">
+        <div class="hrow">
+          <div><div class="crumb">HELIX LENDING · ETHEREUM · BASE</div><h3>Protocol health</h3></div>
+          <div style="display:flex;gap:6px"><span class="chip">24h</span><span class="chip">7d</span><span class="chip lime">30d</span><span class="btn-lime">+ Add invariant</span></div>
+        </div>
+        <div class="statgrid">
+          <div class="stat"><div class="k">Invariants</div><div class="v lime">14<span style="font-size:11px;color:#565e58"> / 14 holding</span></div><div class="d">2 evaluated per block</div></div>
+          <div class="stat"><div class="k">Tightest margin</div><div class="v amber">4.2%</div><div class="d">Collateral solvency — band at 5%</div></div>
+          <div class="stat"><div class="k">Open alerts</div><div class="v red">1<span style="font-size:11px;color:#565e58"> critical</span></div><div class="d">ACK overdue · 6 min</div></div>
+          <div class="stat"><div class="k">Heartbeat</div><div class="v" style="font-size:15px;padding-top:4px">Healthy</div><div class="d">last eval 11 s ago · depth 2</div></div>
+        </div>
+        <table class="mock">
+          <tr><th>Invariant</th><th>Kind</th><th>Current margin</th><th>24h</th><th>Severity</th><th>Last eval</th></tr>
+          <tr><td>Collateral solvency — assets ≥ liabilities + 3%</td><td class="mono">derived</td><td><span class="marginbar"><i class="amber" style="width:42%"></i></span> <span class="mono" style="color:#e0a53f">4.2%</span></td><td><svg class="spark" width="64" height="18"><polyline points="0,6 10,7 20,6 30,9 40,10 50,13 64,15" fill="none" stroke="#e0a53f" stroke-width="1.5"/></svg></td><td><span class="sev warn">WARNING</span></td><td class="mono">11 s</td></tr>
+          <tr><td>Share price within [0.99, 1.01] of oracle</td><td class="mono">point</td><td><span class="marginbar"><i style="width:78%"></i></span> <span class="mono" style="color:#b7ff5a">0.31%</span></td><td><svg class="spark" width="64" height="18"><polyline points="0,9 10,8 20,10 30,9 40,8 50,9 64,9" fill="none" stroke="#b7ff5a" stroke-width="1.5"/></svg></td><td><span class="sev ok">HOLDING</span></td><td class="mono">11 s</td></tr>
+          <tr><td>Conservation — deposits − withdrawals = totalAssets</td><td class="mono">point</td><td><span class="marginbar"><i style="width:96%"></i></span> <span class="mono" style="color:#b7ff5a">exact</span></td><td><svg class="spark" width="64" height="18"><polyline points="0,10 20,10 40,10 64,10" fill="none" stroke="#b7ff5a" stroke-width="1.5"/></svg></td><td><span class="sev ok">HOLDING</span></td><td class="mono">1 block</td></tr>
+          <tr><td>Oracle freshness — updatedAt &lt; 1 block</td><td class="mono">temporal</td><td><span class="marginbar"><i style="width:88%"></i></span> <span class="mono" style="color:#b7ff5a">1 blk</span></td><td><svg class="spark" width="64" height="18"><polyline points="0,10 32,10 33,4 34,10 64,10" fill="none" stroke="#b7ff5a" stroke-width="1.5"/></svg></td><td><span class="sev ok">HOLDING</span></td><td class="mono">11 s</td></tr>
+          <tr><td>No new role grants outside multisig</td><td class="mono">event</td><td><span class="marginbar"><i style="width:100%"></i></span> <span class="mono" style="color:#b7ff5a">clean</span></td><td><svg class="spark" width="64" height="18"><polyline points="0,10 64,10" fill="none" stroke="#b7ff5a" stroke-width="1.5"/></svg></td><td><span class="sev ok">HOLDING</span></td><td class="mono">1 block</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="frame-caption"><span>FIG 1.1 — DASHBOARD / PROTOCOL HEALTH</span><span>DESIGN SPEC · DESKTOP 1440</span></div>
+<ul class="annot">
+  <li><strong>Margin, not binary</strong>Pass/fail hides risk trajectory. Every invariant shows how much headroom remains, with the warning band pre-drawn.</li>
+  <li><strong>Block clock in chrome</strong>The live block counter grounds every number in chain time — investigators always know "as of when."</li>
+  <li><strong>ACK overdue inline</strong>The critical alert counter doubles as an accountability nudge; unacked criticals are visible without opening Alerts.</li>
+</ul>
+
+<div class="page-break"></div>
+<h2>Screen 2 — Invariant editor with dry-run</h2>
+<p class="sub">Template-first authoring: pick a vetted template, fill protocol-specific parameters, watch it tested against 7 days of real history before it can be armed. The dry-run gate is the false-positive prevention mechanism from Flow 2.</p>
+<div class="frame">
+  <div class="app">
+    <div class="app-topbar">
+      <div class="logo-mark">U</div>
+      <div class="brand">URMACK<small>WATCH</small></div>
+      <div class="topnav"><span>Dashboard</span><span class="on">Invariants</span><span>Alerts</span><span>Contracts</span><span>Settings</span></div>
+      <div class="topbar-right"><span class="chip">Helix Lending</span><div class="avatar">KM</div></div>
+    </div>
+    <div class="main" style="padding:16px 20px">
+      <div class="hrow">
+        <div><div class="crumb">INVARIANTS · NEW</div><h3>Compose invariant</h3></div>
+        <div style="display:flex;gap:6px"><span class="chip">Save draft</span><span class="btn-lime">Run dry-run →</span></div>
+      </div>
+      <div class="tmpl">
+        <span class="on">✓ Solvency</span><span>Share-price bound</span><span>Conservation of funds</span><span>Collateral ratio</span><span>Oracle freshness</span><span>Privileged action</span><span>Custom</span>
+      </div>
+      <div class="editor">
+        <div class="panel">
+          <h4>Specification (YAML)</h4>
+          <div class="code"><span class="k">name:</span> <span class="s">collateral-solvency</span>
+<span class="k">kind:</span> <span class="s">derived</span>
+<span class="k">severity:</span> <span class="s">critical</span>
+<span class="k">cadence:</span> <span class="s">per_block</span>
+<span class="k">assert:</span>
+  <span class="k">expr:</span> <span class="s">totalAssets &gt;= totalLiabilities * 1.03</span>
+  <span class="k">inputs:</span>
+    - <span class="k">call:</span> <span class="s">pool.totalAssets()</span>
+    - <span class="k">call:</span> <span class="s">oracle.totalLiabilities()</span>
+<span class="k">bands:</span>
+  <span class="k">warn_below:</span> <span class="n">1.05</span>   <span class="c"># margin % → Warning</span>
+<span class="k">temporal:</span>
+  <span class="k">consecutive_blocks:</span> <span class="n">2</span>  <span class="c"># ignore 1-block reorg noise</span></div>
+        </div>
+        <div class="panel">
+          <h4>Dry-run · last 7 days · Ethereum</h4>
+          <div class="chart">
+            <div class="thresh" style="top:12%"><span>FAIL · 0% margin</span></div>
+            <div class="band" style="top:30%"><span>WARN · 5% band</span></div>
+            <svg width="100%" height="100%" viewBox="0 0 320 96" preserveAspectRatio="none" style="position:absolute;inset:0">
+              <polyline points="0,52 40,50 80,54 120,58 160,62 200,66 240,70 280,68 320,64" fill="none" stroke="#b7ff5a" stroke-width="2"/>
+              <polyline points="0,52 40,50 80,54 120,58 160,62 200,66 240,70 280,68 320,64 320,96 0,96" fill="rgba(183,255,90,.08)" stroke="none"/>
+            </svg>
+          </div>
+          <div class="dryrun">
+            <div class="t">✓ Dry-run passed — safe to arm</div>
+            <div class="row"><span>Evaluations</span><span>10,082 blocks</span></div>
+            <div class="row"><span>Failures</span><span>0</span></div>
+            <div class="row"><span>Warning crossings</span><span>0 · min margin 8.7%</span></div>
+            <div class="row"><span>Eval cost</span><span>2 RPC calls / tick · 1.9 ms</span></div>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:6px"><span class="chip">Adjust thresholds</span><span class="chip lime">Arm monitoring</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="frame-caption"><span>FIG 2.1 — INVARIANT COMPOSER / DRY-RUN</span><span>DESIGN SPEC · DESKTOP 1440</span></div>
+<ul class="annot">
+  <li><strong>Templates carry Urmack's research</strong>Each template encodes vetted economic reasoning; "Custom" exists but is visually secondary — most users should never hand-write YAML.</li>
+  <li><strong>Arming is gated</strong>"Arm monitoring" only activates after a passing dry-run; the button state enforces the Flow 2 gate in the UI.</li>
+  <li><strong>Cost transparency</strong>RPC calls per tick shown upfront — monitoring cost predictability is a buyer objection, answered before it's asked.</li>
+</ul>
+
+<div class="page-break"></div>
+<h2>Screen 3 — Alert detail &amp; evidence pack</h2>
+<p class="sub">The screen an engineer lands on from a PagerDuty/WhatsApp ping at 3 a.m. Everything needed to decide "real incident or noise" in one view; the evidence pack is downloadable for IR hand-off.</p>
+<div class="frame">
+  <div class="app">
+    <div class="app-topbar">
+      <div class="logo-mark">U</div>
+      <div class="brand">URMACK<small>WATCH</small></div>
+      <div class="topnav"><span>Dashboard</span><span>Invariants</span><span class="on">Alerts</span><span>Contracts</span><span>Settings</span></div>
+      <div class="topbar-right"><span class="chip" style="border-color:#ff6b5e;color:#ff6b5e">1 CRITICAL OPEN</span><div class="avatar">KM</div></div>
+    </div>
+    <div class="main" style="padding:16px 20px">
+      <div class="crumb">ALERTS · ALRT-0x8F2A · HELIX LENDING</div>
+      <div class="hrow">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="sev crit" style="font-size:9px;padding:4px 10px">CRITICAL</span>
+          <h3>Collateral solvency invariant broken</h3>
+        </div>
+        <div style="display:flex;gap:6px"><span class="chip">Ack</span><span class="chip">False positive</span><span class="btn-lime">Download evidence pack</span></div>
+      </div>
+      <div class="evidence">
+        <div>
+          <div class="panel" style="margin-bottom:10px">
+            <h4>Breach summary</h4>
+            <dl class="kv">
+              <dt>Detected</dt><dd>2026-10-16 14:03:41 UTC · block 21,048,332 (finalized)</dd>
+              <dt>Invariant</dt><dd>totalAssets &gt;= totalLiabilities × 1.03</dd>
+              <dt>Observed</dt><dd style="color:#ff6b5e">ratio = 0.981 (−1.9% margin)</dd>
+              <dt>Previous</dt><dd>1.043 at block 21,048,331 · 1-block delta</dd>
+              <dt>Trigger tx</dt><dd>0x9c2f…a41d · liquidationBatch(42)</dd>
+              <dt>Routing</dt><dd>PagerDuty (paged 14:03) · Telegram · WhatsApp (premium)</dd>
+            </dl>
+          </div>
+          <div class="panel">
+            <h4>Margin · last 6 hours</h4>
+            <div class="chart" style="height:84px">
+              <div class="thresh" style="top:18%"><span>SOLVENCY FLOOR</span></div>
+              <svg width="100%" height="100%" viewBox="0 0 320 84" preserveAspectRatio="none" style="position:absolute;inset:0">
+                <polyline points="0,22 50,24 100,21 150,26 200,25 250,28 288,30 296,72 320,74" fill="none" stroke="#b7ff5a" stroke-width="2"/>
+                <circle cx="296" cy="72" r="4" fill="#ff6b5e"/>
+              </svg>
+            </div>
+            <div style="display:flex;justify-content:space-between;font:7.5px 'JetBrains Mono',monospace;color:#565e58"><span>08:00</span><span>11:00</span><span>14:03 breach</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="panel" style="margin-bottom:10px">
+            <h4>Evidence pack · signed · 90-day retention</h4>
+            <table class="mock">
+              <tr><td class="mono">1 · Breach summary</td><td style="color:#929e97">human + raw spec</td><td><span class="sev ok">✓</span></td></tr>
+              <tr><td class="mono">2 · Values vs thresholds</td><td style="color:#929e97">block-level series</td><td><span class="sev ok">✓</span></td></tr>
+              <tr><td class="mono">3 · 24h margin history</td><td style="color:#929e97">CSV + chart</td><td><span class="sev ok">✓</span></td></tr>
+              <tr><td class="mono">4 · Triggering trace</td><td style="color:#929e97">decoded call tree</td><td><span class="sev ok">✓</span></td></tr>
+              <tr><td class="mono">5 · Privileged events 48h</td><td style="color:#929e97">role/upgrade/watch</td><td><span class="sev ok">✓</span></td></tr>
+              <tr><td class="mono">6 · First-checks playbook</td><td style="color:#929e97">Urmack IR steps</td><td><span class="sev ok">✓</span></td></tr>
+            </table>
+          </div>
+          <div class="panel">
+            <h4>First checks (excerpt)</h4>
+            <ol class="playbook">
+              <li>Verify trigger tx is finalized and not reorg-pending.</li>
+              <li>Compare oracle liabilities vs. pool accounting — stale oracle vs. real shortfall.</li>
+              <li>Check liquidationBatch parameters — partial liquidation ordering bug pattern (ref: Urmack research L-07).</li>
+              <li>If shortfall &gt; 5% for 2+ blocks: activate IR retainer bridge.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="frame-caption"><span>FIG 3.1 — ALERT DETAIL / EVIDENCE PACK</span><span>DESIGN SPEC · DESKTOP 1440</span></div>
+<ul class="annot">
+  <li><strong>Delta context is default</strong>"What changed since last block" answers the first forensic question without any clicking.</li>
+  <li><strong>Evidence as a product</strong>The signed, downloadable pack is the upsell surface into IR retainers — and what makes alerts defensible in postmortems.</li>
+  <li><strong>Playbook cites research</strong>Linking first-checks to Urmack research turns the portal into a distribution channel for the firm's thought leadership.</li>
+</ul>
+
+<div class="page-break"></div>
+<h2>Screen 4 — Onboarding wizard (dry-run step)</h2>
+<p class="sub">Self-serve onboarding from Flow 2. Step 3 — the dry-run gate — is given the most screen space because it is the step that determines whether the customer's first week is silent-and-trustworthy or noisy-and-uninstalled.</p>
+<div class="frame">
+  <div class="app">
+    <div class="app-topbar">
+      <div class="logo-mark">U</div>
+      <div class="brand">URMACK<small>WATCH</small></div>
+      <div class="topnav"><span>Dashboard</span><span>Invariants</span><span>Alerts</span><span>Contracts</span><span>Settings</span></div>
+      <div class="topbar-right"><span class="chip">Setup · step 3 of 5</span><div class="avatar">KM</div></div>
+    </div>
+    <div class="main" style="padding:16px 20px">
+      <div class="steps">
+        <div class="step done"><span class="num">✓</span>Protocol</div>
+        <div class="step done"><span class="num">✓</span>Contracts</div>
+        <div class="step on"><span class="num">3</span>Dry-run</div>
+        <div class="step"><span class="num">4</span>Routing</div>
+        <div class="step"><span class="num">5</span>Arm</div>
+      </div>
+      <div class="two">
+        <div class="panel">
+          <h4>Dry-run configuration</h4>
+          <div class="field"><label>Historical window</label><div class="input">7 days (recommended) · 30 days (max)</div></div>
+          <div class="two">
+            <div class="field"><label>Chain</label><div class="input">Ethereum mainnet</div></div>
+            <div class="field"><label>Finality depth</label><div class="input">2 blocks</div></div>
+          </div>
+          <div class="field"><label>Invariants in run</label><div class="input">4 selected — solvency, share-price, conservation, oracle freshness</div></div>
+          <div style="display:flex;gap:6px;margin-top:10px"><span class="chip">Back</span><span class="btn-lime">Start dry-run · ~6 min</span></div>
+          <div style="font:7.5px 'JetBrains Mono',monospace;color:#565e58;margin-top:8px">Historical RPC cost billed at pass-through. Typical 7-day run: &lt; $0.40.</div>
+        </div>
+        <div class="panel">
+          <h4>Dry-run progress · live</h4>
+          <div class="dryrun" style="border-color:rgba(183,255,90,.35)">
+            <div class="row"><span>Scanning blocks 20,951,120 → 21,048,332</span><span style="color:#b7ff5a">92%</span></div>
+            <div style="height:5px;background:#202725;border-radius:3px;margin:8px 0"><div style="width:92%;height:5px;background:#b7ff5a;border-radius:3px"></div></div>
+            <div class="row"><span>solvenvy-collateral</span><span style="color:#b7ff5a">✓ 10,082 evals · 0 fail · min margin 8.7%</span></div>
+            <div class="row"><span>share-price-bound</span><span style="color:#b7ff5a">✓ 10,082 evals · 0 fail · min margin 0.31%</span></div>
+            <div class="row"><span>conservation-totalAssets</span><span style="color:#b7ff5a">✓ 10,082 evals · 0 fail</span></div>
+            <div class="row"><span>oracle-freshness</span><span style="color:#e0a53f">⚠ 2 stale windows (blocks …771–…780) — reviewed</span></div>
+          </div>
+          <div style="font:8px 'JetBrains Mono',monospace;color:#929e97;margin-top:8px;line-height:1.6">The 2 stale windows on 12 Oct match the known Chainlink maintenance window. Mark as reviewed to exclude from arming baseline.</div>
+          <div style="display:flex;gap:6px;margin-top:10px"><span class="chip">View block ranges</span><span class="chip lime">Mark reviewed → continue</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="frame-caption"><span>FIG 4.1 — ONBOARDING / DRY-RUN GATE</span><span>DESIGN SPEC · DESKTOP 1440</span></div>
+<ul class="annot">
+  <li><strong>Findings during setup build trust</strong>Surfacing the stale-oracle window (and explaining it) demonstrates value before the first alert — the product already "did security work" during signup.</li>
+  <li><strong>Cost stated before the run</strong>Pass-through RPC cost disclosed upfront; hidden costs are the fastest way to lose a technical buyer's trust.</li>
+  <li><strong>Arming is a separate, final step</strong>Routing (step 4) configures who hears about problems before anything can actually go wrong — prevents the day-one-no-alerts churn.</li>
+</ul>
+
+<div class="footer-note">Urmack Watch — Product Designs · v1.0 · 16 Oct 2026 · Companion: 01 System Architecture, 02 Flows &amp; SDLC Roadmap · Designs are build specifications; no working software is depicted.</div>
+
+</body>
+</html>
